@@ -1,0 +1,28 @@
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+
+class Menu extends Component {
+    
+    logout = (e, href) =>{
+        e.preventDefault();
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        this.props.history.push("/");
+    }
+
+    render() {
+      return (
+        <div className="ui huge borderless fixed fluid menu" style={{backgroundColor:"skyblue"}}>
+            <a href="/" className="header item"> SiteGauge</a>
+            <div className="right menu">
+                <a href="/" className="item">Profile</a>
+                <a href="/" className="item">Help</a>
+                <a href="/" className="item" onClick={(e)=> {this.logout(e,"/")}}>Logout</a>
+
+            </div>
+        </div>
+      );
+    }
+}
+
+export default withRouter(Menu)
