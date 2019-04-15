@@ -14,10 +14,11 @@ class AddSM extends Component {
             accounts:[],
             page: '',
             errorLogIn: '',
+            fbData: ''
         }
     }
 
-        changeType = (event) => {
+    changeType = (event) => {
         this.setState({type:parseInt(event.target.value, 10)});
     }
 
@@ -44,7 +45,6 @@ class AddSM extends Component {
         console.log(response.accessToken);
         axios.get(`https://sitegauge.io/login/facebook/callback?token=${response.accessToken}`)
             .then((response) => {
-                console.log(response);
                 this.setState({
                     pages: response.data
                 });
@@ -83,7 +83,6 @@ class AddSM extends Component {
 
     save = (event) => {
         event.preventDefault();
-        console.log(this.findPage());
         const acct = this.state.type === 0 ?  
             {
                 pageId: this.findPage().id,
@@ -107,16 +106,28 @@ class AddSM extends Component {
             : 
             "https://sitegauge.io/api/twitter/add-account";
          
-        console.log(acct);
         axios.post(url,
             acct,
           )
+        .then((response) => {
+            console.log(response);
+        })
+        .catch((error) => { 
+            console.log(error); 
+        });
+
+        if(this.state.type === 0){
+            console.log(acct.pageId);
+            axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
             .then((response) => {
                 console.log(response);
             })
             .catch((error) => { 
                 console.log(error); 
-            });
+            });    
+        }
+        
+
     }
 
     getAccounts = () => {
