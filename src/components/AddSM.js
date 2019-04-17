@@ -81,6 +81,24 @@ class AddSM extends Component {
         });
     }
 
+    appendAcct = (id) => {
+        const userId = localStorage.getItem('userId');
+        const key = {
+            type: this.state.type,
+            userId: userId,
+        }
+
+        if(!localStorage.getItem(JSON.stringify(key))){
+            localStorage.setItem(JSON.stringify(key), JSON.stringify([id]));
+        }
+        else{
+            const pages = JSON.parse(localStorage.getItem(JSON.stringify(key)));
+            pages.push(id);
+            localStorage.setItem(JSON.stringify(key), JSON.stringify(pages));
+        }    
+        
+    }
+
     save = (event) => {
         event.preventDefault();
         const acct = this.state.type === 0 ?  
@@ -100,7 +118,7 @@ class AddSM extends Component {
                 tweets: this.state.accounts.tweets,
                 userId: localStorage.getItem("userId")
             }
-
+        
         const url = this.state.type === 0 ? 
             "https://sitegauge.io/api/fb/add-page" 
             : 
@@ -111,6 +129,8 @@ class AddSM extends Component {
           )
         .then((response) => {
             console.log(response);
+            // save accounts of user to localstorage if only there's no error
+            this.appendAcct(this.state.type===0? acct.pageId : acct.id);
         })
         .catch((error) => { 
             console.log(error); 
@@ -126,7 +146,6 @@ class AddSM extends Component {
                 console.log(error); 
             });    
         }
-        
 
     }
 
@@ -178,7 +197,7 @@ class AddSM extends Component {
                                     <form className="ui form">
                                         <div className="field">
                                             <label>Type</label>
-                                            <select className="ui fluid dropdown" value={this.state.type === 0? 0 : 1}onChange={this.changeType}>
+                                            <select className="ui fluid dropdown" value={this.state.type === 0? 0 : 1} onChange={this.changeType}>
                                                 <option value="0">Facebook</option>
                                                 <option value="1">Twitter</option>
                                             </select>
