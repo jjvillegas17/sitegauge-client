@@ -15,8 +15,7 @@ class Menu extends Component {
         <div className="ui huge borderless fixed fluid menu" style={{backgroundColor:"skyblue"}}>
             <a href="/" className="header item"> SiteGauge</a>
             <div className="right menu">
-                <a href="/" className="item">Profile</a>
-                <a href="/" className="item">Help</a>
+                <a href="/profile" className="item">Profile</a>
                 <a href="/" className="item" onClick={(e)=> {this.logout(e,"/")}}>Logout</a>
 
             </div>
@@ -25,4 +24,4 @@ class Menu extends Component {
     }
 }
 
-export default withRouter(Menu)
+export default withRouter(Menu);
