@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import Menu from './Menu';
 import axios from 'axios';
 import FacebookPage from './FacebookPage';
+import TwitterAccount from './TwitterAccount';
 
 class D extends Component {
     constructor(props) {
@@ -10,32 +11,32 @@ class D extends Component {
 
         this.state = {
             pages: [],
-            accounts: [],
+            twitters: [],
             loaded: false,
         }
     }
 
     getPages = () => {
         const userId = localStorage.getItem("userId");
-        return axios.get(`https://sitegauge.io/api/fb/${userId}/pages`);
+        return axios.get(`https://sitegauge.io/api/fb/${userId}/pages`)
     }
 
     getTwitters =  () => {
         const userId = localStorage.getItem("userId");
-        return axios.get(`https://sitegauge.io/api/twitter/${userId}/accounts`);
+        return axios.get(`https://sitegauge.io/api/twitter/${userId}/accounts`)
     }
 
     async componentDidMount(){
         const pages = await this.getPages();
         const twitters = await this.getTwitters();
-        axios.get(`https://sitegauge.io/api/twitter/Papajjay/update-account?token=1051570758-PkX7uIurnr8Jibr3Q2ycvXyRjcVp7i72URnF0wc&tokenSecret=6riQfa9rHko8yG21PlYsiMHU0ebH4cJFir5hkWcuN1RII`)
-            .then((res) => {
-                console.log(res);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-        this.setState({ pages: pages.data});  
+        // axios.get(`https://sitegauge.io/api/twitter/${userId}/update-account?username=${username}token=1051570758-PkX7uIurnr8Jibr3Q2ycvXyRjcVp7i72URnF0wc&tokenSecret=6riQfa9rHko8yG21PlYsiMHU0ebH4cJFir5hkWcuN1RII`)
+        //     .then((res) => {
+        //         console.log(res);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     })i
+        this.setState({ pages: pages.data, twitters: twitters.data});  
     }
 
     formatDate = (date) => {
@@ -87,12 +88,40 @@ class D extends Component {
                         </div>
                         <div className="ui divider" style={{marginTop:"-5px"}}></div>
                         {
-                            this.state.pages.length === 0? 
+                            (this.state.pages.length  && this.state.twitters.length) === 0? 
                             null 
                             :
                             this.state.pages.map(page => {
                                 return (
                                     <FacebookPage id={page.id} name={page.page_name} token={page.access_token} key={page.id} />
+                                )
+                            })
+                        }
+                        <div className="four column row">
+                            <div className="left floated column">
+                                <h1 className="ui huge header" style={{
+                                    fontSize:"36px"
+                                }}>
+                                    Twitter
+                                </h1>
+                            </div>
+                            <div className="right floated column">
+                                <button className="ui button" style={{ width: "180px"}}>
+                                    Download Twitter Analytics
+                                </button>
+                            </div>
+                        </div>
+                        <div className="ui divider" style={{marginTop:"-5px"}}></div>
+                        {
+                            (this.state.pages.length  && this.state.twitters.length) === 0? 
+                            null 
+                            :
+                            this.state.twitters.map(twitter => {
+                                return (
+                                    <TwitterAccount 
+                                        id={twitter.id} username={twitter.username} 
+                                        followers={twitter.followers} following={twitter.following}
+                                        tweets={twitter.tweets} key={twitter.id} />
                                 )
                             })
                         }
