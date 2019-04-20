@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
 import axios from 'axios';
-import queryString from 'query-string';
 /* make a home component then accept a props that will
    identify which is to be rendered in the content part
 */
