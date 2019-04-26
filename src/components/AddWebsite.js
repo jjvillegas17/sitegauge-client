@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
+import axios from 'axios';
+import queryString from 'query-string';
 
 /* make a home component then accept a props that will
    identify which is to be rendered in the content part
@@ -8,15 +10,117 @@ import Menu from './Menu';
 
 class AddWebsite extends Component {
     state = {
-        type: 0
+        token: '',
+        refreshToken: '',
+        accounts: [],
+        account: '',
+        property: '',
+        profile: '',
+        email:'',
+        loading: false,
     }
 
-    changeType = (type) => {
-        this.setState({type:type});
-        console.log(this.state.type);
+    handleLogin = (e) => {
+        e.preventDefault();
+        axios.get(`https://sitegauge.io/login/google`)
+            .then((res) => {
+                console.log(res.data);
+                window.location.href = res.data;
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+
+    async componentDidMount(){
+        const qs = queryString.parse(this.props.location.search);
+        if(Object.keys(qs).length === 0){
+            return
+        }
+
+        axios.get(`https://sitegauge.io/api/google/get-accounts?token=${qs.token}`)
+            .then((res) => {
+                this.setState({
+                    accounts: res.data, 
+                    account: res.data[0],
+                    property: res.data[0].properties[0],
+                    profile: res.data[0].properties[0].views[0],
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+
+        this.setState({ token: qs.token, refreshToken: qs.refreshToken, email: qs.email });
+    }
+
+    changeAccount = (e) => {
+        console.log(JSON.parse(e.target.value));
+        const account = JSON.parse(e.target.value);
+        // const account = this.state.accounts.find(obj => {
+        //   return obj.accountId === e.target.value
+        // });
+        this.setState({ account: account, property: account.properties[0], profile: account.properties[0].views[0] });
+    }
+
+    changeProperty = (e) => {
+        this.setState({ property: JSON.parse(e.target.value) });
+        // console.log(this.state);
+    }
+
+    changeView = (e) => {
+        console.log(JSON.parse(e.target.value));
+        this.setState({ profile: JSON.parse(e.target.value) });
+    }
+
+    save = async (e) => {
+        e.preventDefault();
+        this.setState({loading: true});
+        await axios.post(`https://sitegauge.io/api/google/add-account`, {
+            dateCreated:this.state.property.dateCreated,
+            profileId: this.state.profile.profileId,
+            profileName: this.state.profile.profileName,
+            propertyId: this.state.property.propertyId,
+            propertyName: this.state.property.propertyName,
+            userId: localStorage.getItem("userId"),
+            email: this.state.email,
+            token: this.state.token,
+            refreshToken: this.state.refreshToken,
+        })
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
+
+        console.log(this.state.profile.profileId);
+        console.log(this.state.token);
+        await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-acquisition-metrics?token=${this.state.token}`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => { 
+                console.log(error); 
+            });
+
+        await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => { 
+                console.log(error); 
+            });
+
+        await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-behavior-metrics?token=${this.state.token}`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => { 
+                console.log(error); 
+            });
+
+        window.location.href = "/dashboard";    
     }
 
     render() {
+        console.log(this.state);
         return (
             <div>
                 <Menu />
@@ -43,34 +147,90 @@ class AddWebsite extends Component {
                                     </h1>
                                 </div>
                                 <div className="ui raised very padded text container segment">
-                                    <form className="ui form">
+                                   <button className="ui facebook button"
+                                       onClick={this.handleLogin}
+                                   >
+                                       Sign in to Google
+                                   </button>
+                                   <form className="ui form">
+                                       <div className="field">
+                                       </div>
+                                   {
+                                       this.state.accounts.length === 0? 
+                                       null
+                                       :
                                         <div className="field">
-                                            <label>Type</label>
-                                            <select className="ui fluid dropdown" onChange={this.changeType} >
-                                                <option value="0">Facebook</option>
-                                                <option value="1">Twitter</option>
+                                            <label>Accounts</label>
+                                            <select className="ui fluid dropdown" onChange={this.changeAccount}>
+                                                {    
+                                                    this.state.accounts.map(acc => {
+                                                        return <option value={JSON.stringify(acc)} 
+                                                                        key={acc.accountId}
+                                                               >{acc.accountName}</option>
+                                                    })
+                                                }
                                             </select>
                                         </div>
-                                        <div className="field">
-                                            <button className="ui facebook button">
-                                                <i className="facebook icon"></i>
-                                                Sign in to Facebook
-                                            </button>
-                                        </div>
-                                        <div className="field">
-                                            <label>Pages</label>
-                                            <select className="ui fluid dropdown" onChange={this.changeType} >
-                                                <option value="0">My Fb Page1</option>
-                                                <option value="1">My Fb Page2</option>
-                                                <option value="2">My Fb Page3</option>
+                                           
+                                   }
+                                   {
+                                       this.state.account === '' ?
+                                       null
+                                       :
+                                       <div className="field">
+                                            <label>Properties</label>
+                                            <select className="ui fluid dropdown" onChange={this.changeProperty}>
+                                                {   
+                                                    this.state.account.properties.map(property => {
+                                                        return <option 
+                                                                value={JSON.stringify(property)} 
+                                                                key={property.propertyId}>{property.propertyName}</option>
+                                                    })
+                                                }
                                             </select>
                                         </div>
-                                        <div className="field">
-                                            <button className="ui primary button">
+                                   }
+                                   {
+                                       this.state.property === '' ?
+                                       null
+                                       :
+                                       <div className="field">
+                                            <label>Views</label>
+                                            <select className="ui fluid dropdown" onChange={this.changeView}>
+                                                {   
+                                                    this.state.property.views.map(profile => {
+                                                        return <option 
+                                                                 value={JSON.stringify(profile)} 
+                                                                 key={profile.profileId}>{profile.profileName}</option>
+                                                    })
+                                                }
+                                            </select>
+                                        </div>
+                                   }
+                                   {
+                                       this.state.accounts.length === 0?
+                                       null
+                                       :
+                                       <div className="field">
+                                            <button 
+                                                onClick={this.save}
+                                                className="ui primary button"
+                                            >
                                               Save
                                             </button>
                                         </div>
-                                    </form>
+                                   }
+                                   {
+                                       this.state.loading === true?
+                                        <div className="field">
+                                            <div className="ui active centered inline text loader">
+                                                Saving analytics
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                    }    
+                                   </form>
                                 </div>
                             </div>
                         </div>

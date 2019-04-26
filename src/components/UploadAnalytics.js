@@ -16,6 +16,7 @@ class UploadAnalytics extends Component {
             pages: [],
             gaccounts:[],
             selectedAccount: '',
+            loading: false,
         }
     }
 
@@ -23,15 +24,16 @@ class UploadAnalytics extends Component {
         this.setState({file: e.target.files[0]});
     }
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
         const id = this.refs.account.value;
         let formData = new FormData();
         formData.append('file', this.state.file);
 
+        this.setState({loading: true});
         console.log(formData);
         if(this.state.type === 2){
-            axios.post(`https://sitegauge.io/api/twitter/${id}/upload`,
+            await axios.post(`https://sitegauge.io/api/twitter/${id}/upload`,
                 formData,
                 {
                     headers:{
@@ -46,6 +48,7 @@ class UploadAnalytics extends Component {
                 console.log(error); 
             });
         }
+        window.location.href = "/dashboard";
     }
 
     changeType = (e) => {
@@ -165,6 +168,16 @@ class UploadAnalytics extends Component {
                                                 Upload
                                             </button>
                                         </div>
+                                        {
+                                           this.state.loading === true?
+                                            <div className="row" style={{ marginTop: "15px"}}>
+                                                <div className="ui active centered inline text loader">
+                                                    Saving analytics
+                                                </div>
+                                            </div>
+                                            :
+                                            null
+                                        } 
                                     </div>
                                 </form>
                             </div>

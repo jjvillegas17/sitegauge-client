@@ -24,7 +24,8 @@ class FacebookPage extends Component{
             isOpen: false,
             startDate: today.clone().subtract(10, "days"),
             endDate: today.clone().subtract(3, "days"),
-            minDate: today.clone().subtract(10, "days")
+            minDate: today.clone().subtract(10, "days"),
+            maxDate: today.clone().subtract(3, "days"),
         }
     }
 
@@ -48,7 +49,8 @@ class FacebookPage extends Component{
         const end = typeof  endD !== 'undefined' ? 
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
-        axios.get(`https://sitegauge.io/api/fb/341693319367148/fetch-metrics?start=${start}&end=${end}`)
+        // add userId to params & dynamic fb page id
+        axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/fetch-metrics?start=${start}&end=${end}`)
             .then((res) => {
                 this.setState({pageMetrics: Object.values(res.data.data.page_metrics)});
             })
@@ -115,7 +117,7 @@ class FacebookPage extends Component{
                                     onSelect={this.onSelect}
                                     singleDateRange={true}
                                     minimumDate={this.state.minDate}
-                                    maximumDate={this.state.endDate}
+                                    maximumDate={this.state.maxDate.toDate()}
                                 />
                             </div>
                             <div className="column"></div>
@@ -137,6 +139,7 @@ class FacebookPage extends Component{
                            <div className="ui cards">
                                {
                                    pm.map(metric => {
+                                       console.log(metric);
                                        return (                                
                                            <MetricCard 
                                                state={this.state.pageMetrics} 

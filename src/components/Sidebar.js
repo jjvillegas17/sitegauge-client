@@ -11,7 +11,7 @@ class Sidebar extends Component {
             width: "20%", 
           }}>
             <Menu secondary vertical fluid style={{
-                backgroundColor:"skyblue", 
+                backgroundColor:"#3cbcc3", 
                 minHeight: "100vh"
             }}>
                 <br />

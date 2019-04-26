@@ -40,15 +40,15 @@ class TwitterAccount extends Component{
                 </div>
                 <div className="ui six column centered row">
 	                <div className="column">
-                		<div className="ui card" style={{ width: "150px"}}>
+                		<div className="ui card" style={{ width: "150px", backgroundColor:"#438945"}}>
                 			<div className="content">
-							    <div class="header">{this.state.tweets}</div>
-							    <div class="meta">Tweets</div>
+							    <div className="header">{this.state.tweets}</div>
+							    <div className="meta">Tweets</div>
 							</div>
                 		</div>
 	              	</div>
 	              	<div className="column">
-	              		<div className="ui card" style={{ width: "150px"}}>
+	              		<div className="ui card" style={{ width: "150px", backgroundColor:"#438945"}}>
                 			<div className="content">
 							    <div className="header">{this.state.following}</div>
 							    <div className="meta">Following</div>
@@ -56,7 +56,7 @@ class TwitterAccount extends Component{
                 		</div>
 	              	</div>
 	              	<div className="column">
-	              		<div className="ui card" style={{ width: "150px"}}>
+	              		<div className="ui card" style={{ width: "150px", backgroundColor:"#438945"}}>
                 			<div className="content">
 							    <div className="header">{this.state.followers}</div>
 							    <div className="meta">Followers</div>

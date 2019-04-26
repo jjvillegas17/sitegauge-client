@@ -14,7 +14,8 @@ class AddSM extends Component {
             accounts:[],
             page: '',
             errorLogIn: '',
-            fbData: ''
+            fbData: '',
+            loading: false,
         }
     }
 
@@ -99,8 +100,9 @@ class AddSM extends Component {
         
     }
 
-    save = (event) => {
+    save = async (event) => {
         event.preventDefault();
+        this.setState({loading: true});
         const acct = this.state.type === 0 ?  
             {
                 pageId: this.findPage().id,
@@ -124,7 +126,7 @@ class AddSM extends Component {
             : 
             "https://sitegauge.io/api/twitter/add-account";
          
-        axios.post(url,
+        await axios.post(url,
             acct,
           )
         .then((response) => {
@@ -138,7 +140,7 @@ class AddSM extends Component {
 
         if(this.state.type === 0){
             console.log(acct.pageId);
-            axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
+            await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
             .then((response) => {
                 console.log(response);
             })
@@ -146,6 +148,8 @@ class AddSM extends Component {
                 console.log(error); 
             });    
         }
+
+        window.location.href = "/dashboard";
 
     }
 
@@ -236,6 +240,16 @@ class AddSM extends Component {
                                               Save
                                             </button>
                                         </div>
+                                        {
+                                           this.state.loading === true?
+                                            <div className="field">
+                                                <div className="ui active centered inline text loader">
+                                                    Saving analytics
+                                                </div>
+                                            </div>
+                                            :
+                                            null
+                                        }   
                                     </form>
                                 </div>
                             </div>

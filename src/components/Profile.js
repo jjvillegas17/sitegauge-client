@@ -125,6 +125,31 @@ class Profile extends Component {
 								    </tbody>
 								</table>
 	                        </div>
+	                        <div className="row">
+	                        	<table className="ui celled striped table">
+			                		<thead>
+									    <tr>
+									    	<th>
+		                                		<h3 className="ui medium header">
+		                                			Google Analytics
+		                                		</h3>
+											</th>
+									    </tr>
+								    </thead>
+								    <tbody>
+									    {
+									    	this.state.accounts.googles.map(google => {
+									    		console.log(google);
+									    		return (
+									    			<tr>
+									    				<td>{google.property_name}</td>
+									    			</tr>
+									    		)
+									    	})
+									    }
+								    </tbody>
+								</table>
+	                        </div>
 	                        </Fragment>
                     	}
                     </div>

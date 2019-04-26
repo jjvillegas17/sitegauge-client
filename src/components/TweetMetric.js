@@ -1,7 +1,6 @@
 import React from 'react';
 
 const TweetMetric = (props) => {
-	console.log(props);
 	return (
 		<tr>
 	      <td><a href={props.props.link}>{props.props.text.substring(0,100)}</a></td>

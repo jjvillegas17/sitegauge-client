@@ -76,7 +76,7 @@ class Login extends Component {
         return (
           <div className="ui grid container" style={{marginTop:"20px"}}>
             <div className="ui text container">
-                    <div className="ui center aligned segment" style={{borderRadius:'20px'}}>
+                    <div className="ui center aligned segment" style={{borderRadius:'20px', backgroundColor:"#3cbcc3"}}>
                         <div>
                             <h1 className="ui center aligned header">Log in to your account</h1>
                             <div></div>
@@ -132,7 +132,7 @@ class Login extends Component {
                                 </div>
                         </form>
                         <div className="ui center aligned grid" style={{marginTop:'30px', marginBottom:'10px'}}>
-                            <p>Don't have an account? <a href="/">Sign Up</a></p>
+                            <p>Don't have an account? <a href="/" style={{color: "red"}}>Sign Up</a></p>
                         </div>
                     </div>
                 </div>

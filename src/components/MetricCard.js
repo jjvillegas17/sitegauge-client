@@ -23,11 +23,11 @@ const transformStr = (str) => {
 	return newStr;
 }
 const MetricCard = (props) => {
+	console.log(props.state);
 	return (
 		<div className="ui card">
-	        <div className="content"> 
+	        <div className="content" style={{backgroundColor: "#438945"}}> 
 	            <div className="header">{transformStr(props.metric)}</div> 
-	            <i className="angle double up green icon"></i>
 	        </div>
 	        <div className="content">
 	            <h5 className="ui subheader">
@@ -38,7 +38,7 @@ const MetricCard = (props) => {
 	            <LineChart width={280} height={250} data={props.state}
 	              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
 	              <CartesianGrid strokeDasharray="3 3" />
-	              <XAxis dataKey="date_retrieved" />
+	              <XAxis dataKey="date_retrieved"/>
 	              <YAxis />
 	              <Tooltip />
 	              <Line type="monotone" name={transformStr(props.metric)} dataKey={props.metric} stroke="#8884d8" />
