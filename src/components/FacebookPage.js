@@ -3,9 +3,12 @@ import MetricCard from './MetricCard';
 import DateRangePicker from "react-daterange-picker";
 import "react-daterange-picker/dist/css/react-calendar.css";
 import axios from 'axios';
+import { CSVLink } from "react-csv";
 import originalMoment from "moment";
 import { extendMoment } from "moment-range";
+
 const moment = extendMoment(originalMoment);
+
 
 const pm = ['views', 'impressions', 'engagements', 'posts_engagements', 
             'content_activity', 'negative_feedback', 'new_likes', 'video_views'];
@@ -26,21 +29,29 @@ class FacebookPage extends Component{
             endDate: today.clone().subtract(3, "days"),
             minDate: today.clone().subtract(10, "days"),
             maxDate: today.clone().subtract(3, "days"),
+            errorLoading: false,
         }
     }
 
     async componentDidMount(){
-        await this.updateMetricsDb();
-        await this.getMinDate(this.state.pageId);
-        await this.fetchMetrics();
+        try{
+            await this.updateMetricsDb();
+        } catch(error){
+            console.log("error");
+            this.setState({errorLoading: true});
+        }
+
+        const minDate = await this.getMinDate(this.state.pageId);
+        const fetchMetrics = await this.fetchMetrics();
+
+        this.setState({ minDate: new Date(minDate.data.data)});
+        this.setState({pageMetrics: Object.values(fetchMetrics.data.data.page_metrics)});
     }
 
     updateMetricsDb = () => {
-        axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics?pageToken=${this.state.pageToken}`)
-            .then((res) => {
-            })
-            .catch((err) => { 
-            }); 
+        console.log(this.state.pageId);
+        console.log(this.state.pageToken);
+        return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics?pageToken=${this.state.pageToken}`)
     } 
 
     fetchMetrics = (startD, endD) => {
@@ -50,31 +61,20 @@ class FacebookPage extends Component{
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
         // add userId to params & dynamic fb page id
-        axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/fetch-metrics?start=${start}&end=${end}`)
-            .then((res) => {
-                this.setState({pageMetrics: Object.values(res.data.data.page_metrics)});
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/fetch-metrics?start=${start}&end=${end}`)
     }
 
     getMinDate = (pageId) => {
-        axios.get(`https://sitegauge.io/api/fb/${pageId}/min-date`)
-            .then((res) => {
-                this.setState({ minDate: new Date(res.data.data)});
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        return axios.get(`https://sitegauge.io/api/fb/${pageId}/min-date`)
     }
 
     onToggle = () => {
          this.setState({ isOpen: !this.state.isOpen });
     }
 
-    onSelect = (date, states) => {
-        this.fetchMetrics(date.start, date.end);
+    onSelect = async (date, states) => {
+        const metrics = await this.fetchMetrics(date.start, date.end);
+        this.setState({ pageMetrics: Object.values(metrics.data.data.page_metrics) });
         this.setState({  startDate: date.start, endDate: date.end });
     }
 
@@ -88,12 +88,49 @@ class FacebookPage extends Component{
         );
     }
 
-    render(){
+    checkError = () => {   // get the function to props that will update the errorLoading state
+        // of D.js, then check in D.js if error loading and output a modal
+        if(this.state.errorLoading === true){
+            return (
+                <h3 className="ui header"> Could not fetch analytics data. Try reloading</h3>
+            )
+        }
+        else{
+            return (
+                this.state.pageMetrics.length === 0? 
+                <div className="ui active centered inline text loader">
+                    Fetching analytics
+               </div>
+               :
+               <div className="ui cards">
+                   {
+                       pm.map(metric => {
+                           return (                                
+                               <MetricCard 
+                                   state={this.state.pageMetrics} 
+                                   metric={metric}
+                                   startDate={this.state.startDate}
+                                   endDate={this.state.endDate}
+                                   key={metric}
+                               />    
+                           )
+                       })
+                   }
+               </div>
+              )
+        }
+    }
 
+    render(){
         return(
             <Fragment>
-                <div className="row">
-                    <h2 className="ui header">{this.state.pageName}</h2>
+                <div className="four column row">
+                    <h2 className="ui header">{this.state.pageName}</h2>    
+                    <div className="right floated column">
+                                    <button className="ui button" style={{ width: "190px"}}>
+                                        <CSVLink data={this.state.pageMetrics}>Download Insights</CSVLink>
+                                    </button>
+                                </div>
                 </div>
                 <div className="six column row">
                     <div className="column" style={{ marginTop:"10px", marginLeft: "-10px"}} >
@@ -131,27 +168,7 @@ class FacebookPage extends Component{
                 </div>
                 <div className="row">
                     {
-                        this.state.pageMetrics.length === 0? 
-                            <div className="ui active centered inline text loader">
-                                Fetching analytics
-                           </div>
-                           :
-                           <div className="ui cards">
-                               {
-                                   pm.map(metric => {
-                                       console.log(metric);
-                                       return (                                
-                                           <MetricCard 
-                                               state={this.state.pageMetrics} 
-                                               metric={metric}
-                                               startDate={this.state.startDate}
-                                               endDate={this.state.endDate}
-                                               key={metric}
-                                           />    
-                                       )
-                                   })
-                               }
-                           </div>
+                        this.checkError()
                     }
                 </div>
             </Fragment>

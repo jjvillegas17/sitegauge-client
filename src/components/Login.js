@@ -58,7 +58,6 @@ class Login extends Component {
             });
           })
           .catch((error) => {
-            // console.log(error.response.data.message);
             this.setState({
                 error: error.response.data.message,
                 toRedirect: false
@@ -132,7 +131,7 @@ class Login extends Component {
                                 </div>
                         </form>
                         <div className="ui center aligned grid" style={{marginTop:'30px', marginBottom:'10px'}}>
-                            <p>Don't have an account? <a href="/" style={{color: "red"}}>Sign Up</a></p>
+                            <p>Don't have an account? <a href="/signup" style={{color: "red"}}>Sign Up</a></p>
                         </div>
                     </div>
                 </div>

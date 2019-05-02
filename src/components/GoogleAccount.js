@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react';
-import GoogleAudience from './GoogleAudience';
 import MetricCard from './MetricCard';
+import PagePath from './PagePath';
 import {
-  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 import DateRangePicker from "react-daterange-picker";
 import "react-daterange-picker/dist/css/react-calendar.css";
 import axios from 'axios';
+import { CSVLink } from "react-csv";
 import originalMoment from "moment";
 import { extendMoment } from "moment-range";
 const moment = extendMoment(originalMoment);
@@ -31,6 +32,7 @@ class GoogleAccount extends Component{
 		this.state = {
 			audienceMetrics: [],
             behaviorMetrics: [],
+            pageviewsTotal: 0,
             acquisitionMetrics: [],
             isOpen: false,
             startDate: today.clone().subtract(10, "days"),
@@ -59,14 +61,12 @@ class GoogleAccount extends Component{
         const end = typeof  endD !== 'undefined' ? 
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
-        console.log(start);
-        console.log(end);
-        console.log(this.props.data.profile_id);
         axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`)
             .then((res) =>{
                 this.setState({audienceMetrics: Object.values(res.data.audience),
                      acquisitionMetrics: Object.values(res.data.acquisition),
                      behaviorMetrics: Object.values(res.data.behavior),
+                     pageviewsTotal: res.data.pageviews_total,    
                  });
             })
             .catch((err) =>{
@@ -88,99 +88,124 @@ class GoogleAccount extends Component{
 
 		return (
 			<Fragment>
-				<div className="row">
-                    <h2 className="ui header">{this.props.data.property_name}</h2>
-                </div>
-                <div className="six column row">
-                    <div className="column" style={{ marginTop:"10px", marginLeft: "-10px"}} >
-                        <h3 className="ui header">Audience</h3>
-                    </div>
-                    <div className="column" style={{ marginLeft:"-25px"}} >
-                        <input
-                            type="button"
-                            value={this.state.isOpen? "Apply date" : "Pick a date range" }
-                            className="ui button"
-                            onClick={this.onToggle}
-                            style={{ width: "150px"}}
-                        />
-                    </div>
-                    {
-                        this.state.isOpen ?
-                        <Fragment> 
-                            <div className="column">
-                                <DateRangePicker
-                                    value={this.state.value}
-                                    onSelect={this.onSelect}
-                                    singleDateRange={true}
-                                    minimumDate={this.state.minDate.toDate()}
-                                    maximumDate={this.state.maxDate.toDate()}
-                                />
-                            </div>
-                            <div className="column"></div>
-                            <div className="column">{this.renderSelectionValue()}</div>
-                        </Fragment>
-                        :
-                        <Fragment> 
-                            <div className="column">{this.renderSelectionValue()}</div>
-                        </Fragment>
-                    }
-                </div>
-                <div className="row">
-                    {
-                        this.state.audienceMetrics.length === 0? 
-                            <div className="ui active centered inline text loader">
-                                Fetching analytics
-                           </div>
-                           :
-                           <div className="ui cards">
-                               {
-                                   audience.map(metric => {
-                                       console.log(metric);
-                                       return (                                
-                                           <MetricCard 
-                                               state={this.state.audienceMetrics} 
-                                               metric={metric}
-                                               startDate={this.state.startDate}
-                                               endDate={this.state.endDate}
-                                               key={metric}
-                                           />    
-                                       )
-                                   })
-                               }
-                           </div>
-                    }
-                </div>
-                <div className="row">
-                    <h3 className="ui header">Channel Grouping</h3>
-                </div>
-                <div className="row">
-                    {
-                        this.state.acquisitionMetrics.length === 0? 
-                           <div className="ui active centered inline text loader">
-                                Fetching analytics
-                           </div>
-                           :
-                           <BarChart
-                            width={900}
-                            height={300}
-                            data={this.state.acquisitionMetrics}
-                            margin={{
-                              top: 20, right: 5, left: 0, bottom: 5,
-                            }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date_retrieved" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="direct" stackId="a" fill="#8884d8" />
-                            <Bar dataKey="social" stackId="a" fill="#82ca9d" />
-                            <Bar dataKey="referral" stackId="a" fill="#3FEEE6" />
-                            <Bar dataKey="organic_search" stackId="a" fill="#190061" />
-                            <Bar dataKey="other" stackId="a" fill="#82cd7d" />
-                          </BarChart>
-                    }
-                </div>
+				  <div className="four column row">
+            <h2 className="ui header">{this.props.data.property_name}</h2>    
+            <div className="right floated column">
+                <button className="ui button" style={{ width: "190px"}}>
+                    <CSVLink data={this.state.behaviorMetrics}>Download Analytics</CSVLink>
+                </button>
+            </div>
+          </div>
+          <div className="six column row">
+              <div className="column" style={{ marginTop:"10px", marginLeft: "-10px"}} >
+                  <h3 className="ui header">Audience</h3>
+              </div>
+              <div className="column" style={{ marginLeft:"-25px"}} >
+                  <input
+                      type="button"
+                      value={this.state.isOpen? "Apply date" : "Pick a date range" }
+                      className="ui button"
+                      onClick={this.onToggle}
+                      style={{ width: "150px"}}
+                  />
+              </div>
+              {
+                  this.state.isOpen ?
+                  <Fragment> 
+                      <div className="column">
+                          <DateRangePicker
+                              value={this.state.value}
+                              onSelect={this.onSelect}
+                              singleDateRange={true}
+                              minimumDate={this.state.minDate.toDate()}
+                              maximumDate={this.state.maxDate.toDate()}
+                          />
+                      </div>
+                      <div className="column"></div>
+                      <div className="column">{this.renderSelectionValue()}</div>
+                  </Fragment>
+                  :
+                  <Fragment> 
+                      <div className="column">{this.renderSelectionValue()}</div>
+                  </Fragment>
+              }
+          </div>
+          <div className="row">
+              {
+                  this.state.audienceMetrics.length === 0? 
+                      <div className="ui active centered inline text loader">
+                          Fetching analytics
+                     </div>
+                     :
+                     <div className="ui cards">
+                         {
+                             audience.map(metric => {
+                                 return (                                
+                                     <MetricCard 
+                                         state={this.state.audienceMetrics} 
+                                         metric={metric}
+                                         startDate={this.state.startDate}
+                                         endDate={this.state.endDate}
+                                         key={metric}
+                                     />    
+                                 )
+                             })
+                         }
+                     </div>
+              }
+          </div>
+          <div className="row">
+              <h3 className="ui header">Channel Grouping</h3>
+          </div>
+          <div className="row">
+              {
+                  this.state.acquisitionMetrics.length === 0? 
+                     <div className="ui active centered inline text loader">
+                          Fetching analytics
+                     </div>
+                     :
+                     <BarChart
+                      width={900}
+                      height={300}
+                      data={this.state.acquisitionMetrics}
+                      margin={{
+                        top: 20, right: 5, left: 0, bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date_retrieved" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="direct" stackId="a" fill="#8884d8" />
+                      <Bar dataKey="social" stackId="a" fill="#82ca9d" />
+                      <Bar dataKey="referral" stackId="a" fill="#3FEEE6" />
+                      <Bar dataKey="organic_search" stackId="a" fill="#190061" />
+                      <Bar dataKey="other" stackId="a" fill="#82cd7d" />
+                    </BarChart>
+              }
+          </div>
+          <div className="row">
+              <h3 className="ui header">Top 10 Most Visited Pages</h3>
+          </div>
+          <div className="row">
+              <table className="ui striped table">
+                  <thead>
+                      <tr>
+                        <th>Page</th>
+                        <th>Pageviews</th>
+                        <th>% Pageviews</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                  {
+                      this.state.behaviorMetrics.map((metric,i) => {
+                          return <PagePath props={metric} total={this.state.pageviewsTotal} key={i}/>
+                      })
+                  }
+                  </tbody>
+              </table>
+          </div>
 			</Fragment>
 		)
 	}

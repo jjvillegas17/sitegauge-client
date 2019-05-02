@@ -35,8 +35,13 @@ class TwitterAccount extends Component{
     render(){
     	return (
     		<Fragment>
-    			<div className="row">
-                    <h2 className="ui header">@{this.state.username}</h2>
+    			<div className="four column row">
+                    <h2 className="ui header">@{this.state.username}</h2>    
+                    <div className="right floated column">
+                                    <button className="ui button" style={{ width: "190px"}}>
+                                        Download Twitter Analytics
+                                    </button>
+                                </div>
                 </div>
                 <div className="ui six column centered row">
 	                <div className="column">

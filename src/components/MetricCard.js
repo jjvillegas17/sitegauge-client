@@ -23,7 +23,6 @@ const transformStr = (str) => {
 	return newStr;
 }
 const MetricCard = (props) => {
-	console.log(props.state);
 	return (
 		<div className="ui card">
 	        <div className="content" style={{backgroundColor: "#438945"}}> 

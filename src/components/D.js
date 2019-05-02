@@ -63,7 +63,6 @@ class D extends Component {
     }
 
   render() {
-      console.log(this.state);
     return (
     <div>
         <Menu/>
@@ -84,20 +83,13 @@ class D extends Component {
                             null:
                             <Fragment>
                             <div className="four column row">
-                                <div className="left floated column">
                                     <h1 className="ui huge header" style={{
                                         fontSize:"36px"
                                     }}>
                                         Facebook
                                     </h1>
-                                </div>
-                                <div className="right floated column">
-                                    <button className="ui button">
-                                        Download FB Insights
-                                    </button>
-                                </div>
                             </div>
-                            <div className="ui divider" style={{marginTop:"-5px"}}></div>
+                            <div className="ui divider" style={{marginTop:"-15px"}}></div>
                             </Fragment>
                         }
                         {
@@ -114,18 +106,11 @@ class D extends Component {
                             null:
                             <Fragment>
                             <div className="four column row">
-                                <div className="left floated column">
                                     <h1 className="ui huge header" style={{
                                         fontSize:"36px"
                                     }}>
                                         Twitter
                                     </h1>
-                                </div>
-                                <div className="right floated column">
-                                    <button className="ui button" style={{ width: "180px"}}>
-                                        Download Twitter Analytics
-                                    </button>
-                                </div>
                             </div>
                             <div className="ui divider" style={{marginTop:"-5px"}}></div>
                             </Fragment>
@@ -147,18 +132,11 @@ class D extends Component {
                             null:
                             <Fragment>
                             <div className="four column row">
-                                <div className="left floated column">
                                     <h1 className="ui huge header" style={{
                                         fontSize:"36px"
                                     }}>
                                         Google
                                     </h1>
-                                </div>
-                                <div className="right floated column">
-                                    <button className="ui button" style={{ width: "180px"}}>
-                                        Download Google Analytics
-                                    </button>
-                                </div>
                             </div>
                             <div className="ui divider" style={{marginTop:"-5px"}}></div>
                             </Fragment>
@@ -168,7 +146,6 @@ class D extends Component {
                             null 
                             :
                             this.state.googles.map(google => {
-                                console.log(google);
                                 return (
                                     <GoogleAccount 
                                         data={google} key={google.profile_id}/>

@@ -15,9 +15,9 @@ class Menu extends Component {
         <div className="ui huge borderless fixed fluid menu" style={{backgroundColor:"#3cbcc3"}}>
             <a href="/" className="header item"> SiteGauge</a>
             <div className="right menu">
+                <a href="/insights" className="item">Insights</a>
                 <a href="/profile" className="item">Profile</a>
                 <a href="/" className="item" onClick={(e)=> {this.logout(e,"/")}}>Logout</a>
-
             </div>
         </div>
       );
