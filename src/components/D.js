@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
+import { Message } from 'semantic-ui-react'
 import axios from 'axios';
 import FacebookPage from './FacebookPage';
 import TwitterAccount from './TwitterAccount';
@@ -15,6 +16,7 @@ class D extends Component {
             twitters: [],
             googles: [],
             loaded: false,
+            isAnalyticsLoaded: true,
         }
     }
 
@@ -34,17 +36,37 @@ class D extends Component {
     }
 
     async componentDidMount(){
-        const pages = await this.getPages();
-        const twitters = await this.getTwitters();
-        const googles = await this.getGoogles();
+        try{
+            const pages = await this.getPages();  
+            this.setState({ pages: pages.data });  
+        }
+        catch(err){
+            console.log(err);
+        }
+
+        try{
+            const twitters = await this.getTwitters();
+            this.setState({ twitters: twitters.data });  
+        }
+        catch(err){
+            console.log(err);
+        }
+
+        try{
+            const googles = await this.getGoogles();
+            this.setState({ googles: googles.data });  
+        }
+        catch(err){
+            console.log(err);
+        }
+
         // axios.get(`https://sitegauge.io/api/twitter/${userId}/update-account?username=${username}token=1051570758-PkX7uIurnr8Jibr3Q2ycvXyRjcVp7i72URnF0wc&tokenSecret=6riQfa9rHko8yG21PlYsiMHU0ebH4cJFir5hkWcuN1RII`)
         //     .then((res) => {
         //         console.log(res);
         //     })
         //     .catch((err) => {
         //         console.log(err);
-        //     })i
-        this.setState({ pages: pages.data, twitters: twitters.data, googles: googles.data});  
+        //     })i  
     }
 
     formatDate = (date) => {
@@ -75,6 +97,11 @@ class D extends Component {
                     marginTop: "2em",
                     paddingLeft: "1.5em"
                 }}>
+                    <div className="ui two column centered grid">
+                        <div className="ui centered row">
+                        <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
+                        </div>
+                    </div>
                     <div className="ui grid" style={{
                         paddingRight: "4em",
 

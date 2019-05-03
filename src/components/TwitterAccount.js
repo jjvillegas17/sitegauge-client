@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import TweetMetric from './TweetMetric';
+import { CSVLink } from "react-csv";
 import axios from 'axios';
 
 
@@ -15,6 +16,21 @@ class TwitterAccount extends Component{
             tweets: props.tweets,
             tweetMetrics: [],
         }
+    }
+
+    download = () => {
+      let metrics = [];    
+      if(this.state.tweetMetrics.length !== 0){
+        this.state.tweetMetrics.forEach((metric) => {
+          const m = Object.assign({}, metric);
+          m.text = m.text.split("\n").join(" ");
+          metrics.push(m);
+        })
+        console.log(metrics);
+        return metrics;        
+      }
+
+      return [{}];
     }
 
     async componentDidMount(){
@@ -38,10 +54,10 @@ class TwitterAccount extends Component{
     			<div className="four column row">
                     <h2 className="ui header">@{this.state.username}</h2>    
                     <div className="right floated column">
-                                    <button className="ui button" style={{ width: "190px"}}>
-                                        Download Twitter Analytics
-                                    </button>
-                                </div>
+                        <button className="ui button" style={{ width: "190px"}}>
+                            <CSVLink data={this.download()}>Download Tweets</CSVLink>
+                        </button>
+                    </div>
                 </div>
                 <div className="ui six column centered row">
 	                <div className="column">

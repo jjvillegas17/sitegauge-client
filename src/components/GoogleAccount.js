@@ -42,6 +42,36 @@ class GoogleAccount extends Component{
 		}
 	}
 
+  download = (param) => {
+      let metrics = [];
+      let state;
+
+      if(param === "audience"){
+        state = this.state.audienceMetrics;
+      }
+      else if(param === "acquisition"){
+        state = this.state.acquisitionMetrics;
+      }
+      else{
+        state = this.state.behaviorMetrics;
+      }
+
+      if(state.length !== 0){
+        state.forEach((metric) => {
+          const m = Object.assign({}, metric);
+          delete m.created_at; delete m.updated_at;
+          if(param === "audience" || param === "acquisition"){
+            delete m.id;
+          }
+          metrics.push(m);
+        })
+        console.log(metrics);
+        return metrics;        
+      }
+      return [{}];
+
+  }
+
 	async componentDidMount(){
         await this.fetchMetrics();
     }
@@ -62,16 +92,17 @@ class GoogleAccount extends Component{
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
         axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`)
-            .then((res) =>{
-                this.setState({audienceMetrics: Object.values(res.data.audience),
-                     acquisitionMetrics: Object.values(res.data.acquisition),
-                     behaviorMetrics: Object.values(res.data.behavior),
-                     pageviewsTotal: res.data.pageviews_total,    
-                 });
-            })
-            .catch((err) =>{
-                console.log(err);
-            })
+          .then((res) =>{
+              this.setState({
+                  audienceMetrics: Object.values(res.data.audience),
+                  acquisitionMetrics: Object.values(res.data.acquisition),
+                  behaviorMetrics: Object.values(res.data.behavior),
+                  pageviewsTotal: res.data.pageviews_total,    
+               });
+          })
+          .catch((err) =>{
+              console.log(err);
+          })
 	}
 
 	renderSelectionValue = () => {
@@ -90,11 +121,6 @@ class GoogleAccount extends Component{
 			<Fragment>
 				  <div className="four column row">
             <h2 className="ui header">{this.props.data.property_name}</h2>    
-            <div className="right floated column">
-                <button className="ui button" style={{ width: "190px"}}>
-                    <CSVLink data={this.state.behaviorMetrics}>Download Analytics</CSVLink>
-                </button>
-            </div>
           </div>
           <div className="six column row">
               <div className="column" style={{ marginTop:"10px", marginLeft: "-10px"}} >
@@ -129,6 +155,15 @@ class GoogleAccount extends Component{
                       <div className="column">{this.renderSelectionValue()}</div>
                   </Fragment>
               }
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+                <button className="ui button" style={{ width: "190px"}}>
+                    <CSVLink data={this.download("audience")}>Download Audience</CSVLink>
+                </button>
+              </div>
           </div>
           <div className="row">
               {
@@ -154,8 +189,21 @@ class GoogleAccount extends Component{
                      </div>
               }
           </div>
-          <div className="row">
+          <div className="six column row">
               <h3 className="ui header">Channel Grouping</h3>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+                <button className="ui button" style={{ width: "190px"}}>
+                    <CSVLink data={this.download("acquisition")}>Download Channels</CSVLink>
+                </button>
+              </div>
           </div>
           <div className="row">
               {
@@ -185,8 +233,23 @@ class GoogleAccount extends Component{
                     </BarChart>
               }
           </div>
-          <div className="row">
+          <div className="eight column row">
               <h3 className="ui header">Top 10 Most Visited Pages</h3>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>
+              <div className="column">
+              </div>  
+              <div className="column">
+              </div>  
+              <div className="column">
+                <button className="ui button" style={{ width: "190px", marginLeft: "-25px"}}>
+                    <CSVLink data={this.download("behavior")}>Download Pages</CSVLink>
+                </button>
+              </div>
           </div>
           <div className="row">
               <table className="ui striped table">

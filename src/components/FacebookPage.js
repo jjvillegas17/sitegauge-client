@@ -33,9 +33,25 @@ class FacebookPage extends Component{
         }
     }
 
+    download = () => {
+      let metrics = [];    
+      if(this.state.pageMetrics.length !== 0){
+        this.state.pageMetrics.forEach((metric) => {
+          const m = Object.assign({}, metric);
+          delete m.created_at; delete m.updated_at; delete m.id;
+          metrics.push(m);
+        })
+        console.log(metrics);
+        return metrics;        
+      }
+
+      return [{}];
+    }
+
     async componentDidMount(){
         try{
-            await this.updateMetricsDb();
+            const metrics =  await this.updateMetricsDb();
+            console.log(metrics);
         } catch(error){
             console.log("error");
             this.setState({errorLoading: true});
@@ -49,8 +65,6 @@ class FacebookPage extends Component{
     }
 
     updateMetricsDb = () => {
-        console.log(this.state.pageId);
-        console.log(this.state.pageToken);
         return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics?pageToken=${this.state.pageToken}`)
     } 
 
@@ -128,7 +142,7 @@ class FacebookPage extends Component{
                     <h2 className="ui header">{this.state.pageName}</h2>    
                     <div className="right floated column">
                                     <button className="ui button" style={{ width: "190px"}}>
-                                        <CSVLink data={this.state.pageMetrics}>Download Insights</CSVLink>
+                                        <CSVLink data={this.download()}>Download Insights</CSVLink>
                                     </button>
                                 </div>
                 </div>
