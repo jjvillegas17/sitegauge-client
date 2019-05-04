@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
-import { Message } from 'semantic-ui-react'
 import axios from 'axios';
 import FacebookPage from './FacebookPage';
 import TwitterAccount from './TwitterAccount';
@@ -97,11 +96,11 @@ class D extends Component {
                     marginTop: "2em",
                     paddingLeft: "1.5em"
                 }}>
-                    <div className="ui two column centered grid">
+                    {/*<div className="ui two column centered grid">
                         <div className="ui centered row">
                         <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
                         </div>
-                    </div>
+                    </div>*/}
                     <div className="ui grid" style={{
                         paddingRight: "4em",
 

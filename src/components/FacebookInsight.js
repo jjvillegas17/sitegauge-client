@@ -10,6 +10,7 @@ const deftns = {
 	"Page Suggestions": "Page likes that came from people saw your Page in a list of suggested Pages",
 	"Ads": "Page likes that came from people who saw your Page or post in an ad",
 	"News Feed" : "Page likes that came from people who saw content posted by your Page or about your Page in News Feed",
+	"Other": "Page likes that came from other sources"
 };
 
 class FacebookInsight extends Component {
@@ -108,7 +109,7 @@ class FacebookInsight extends Component {
 			        >
 			          <Icon name="dropdown" />
 			          <strong style={{ fontSize: "15px"}}> 
-			          	What are the dates wherein there are peaks in the increase of new likes?
+			          	What are the dates of the current year wherein there are peaks in the increase of new likes?
 			          </strong>
 			        </Accordion.Title>
 			        <Accordion.Content active={activeIndexs.includes(0)}>
@@ -202,9 +203,14 @@ class FacebookInsight extends Component {
 		        			)
 		        		})
 			         }
-			         <p><br/>Analyzing the sources of fans for your page can help 
-			         you determine content and channels where you should invest more time to 
-			         attract new fans.</p>
+			         {
+			         	this.state.topLikeSources.length===0?
+			         	null
+			         	:
+			         	<p><br/>Analyzing the sources of fans for your page can help 
+				         you determine content and channels where you should invest more time to 
+				         attract new fans.</p>
+			         }
 			        </Accordion.Content>
 
 			        <Accordion.Title
@@ -245,9 +251,15 @@ class FacebookInsight extends Component {
 		        			
 		        		})
 			         }
-			         <p><br/>Based from your metrics last week and last month, publish your posts on the hours of day
-			         listed above as such hours are where your fans will most likely see your post.    
-			         </p>
+			         {
+			         	this.state.bestDatesToPost.length===0?
+			         	null
+			         	:
+			         	<p><br/>Based from your metrics last week and last month, publish your posts on the hours of day
+				         listed above as such hours are where your fans will most likely see your post.    
+				         </p>
+			         }
+			         
 			        </Accordion.Content>
 			   </Accordion>
     		</div>

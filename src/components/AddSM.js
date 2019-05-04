@@ -149,7 +149,7 @@ class AddSM extends Component {
             });    
         }
 
-        window.location.href = "/dashboard";
+        // window.location.href = "/dashboard";
 
     }
 

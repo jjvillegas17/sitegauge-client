@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import MetricCard from './MetricCard';
+import { Message } from 'semantic-ui-react';
 import PagePath from './PagePath';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -21,7 +22,7 @@ const moment = extendMoment(originalMoment);
 // refreshToken: props.data.refresh_token,
 
 const audience = ['sessions', 'users', 'new_users', 'sessions_per_user', 
-            'pageviews', 'pageviews_per_session', 'avg_session_duration', 'bounce_rate'];
+            'pageviews', 'pages_per_session', 'avg_session_duration', 'bounce_rate'];
 
 class GoogleAccount extends Component{
 	constructor(props){
@@ -39,6 +40,7 @@ class GoogleAccount extends Component{
             endDate: today.clone().subtract(3, "days"),
             minDate: moment(props.data.date_created),
             maxDate: today,
+            errorLoading: false,
 		}
 	}
 
@@ -65,7 +67,6 @@ class GoogleAccount extends Component{
           }
           metrics.push(m);
         })
-        console.log(metrics);
         return metrics;        
       }
       return [{}];
@@ -85,24 +86,25 @@ class GoogleAccount extends Component{
          this.setState({ isOpen: !this.state.isOpen });
     }
 
-	fetchMetrics = (startD, endD) => {
+	fetchMetrics = async (startD, endD) => {
         const start = typeof startD !== 'undefined' ? 
               startD.format("YYYY-MM-DD") : this.state.startDate.format("YYYY-MM-DD");
         const end = typeof  endD !== 'undefined' ? 
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
-        axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`)
-          .then((res) =>{
-              this.setState({
-                  audienceMetrics: Object.values(res.data.audience),
-                  acquisitionMetrics: Object.values(res.data.acquisition),
-                  behaviorMetrics: Object.values(res.data.behavior),
-                  pageviewsTotal: res.data.pageviews_total,    
-               });
-          })
-          .catch((err) =>{
-              console.log(err);
-          })
+        try{
+          const metrics = await axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`);
+          console.log(metrics);
+          this.setState({audienceMetrics: Object.values(metrics.data.audience),
+                  acquisitionMetrics: Object.values(metrics.data.acquisition),
+                  behaviorMetrics: Object.values(metrics.data.behavior),
+                  pageviewsTotal: metrics.data.pageviews_total});
+        }
+        catch(error){
+          console.log(error);
+          this.setState({errorLoading: true});
+        }
+
 	}
 
 	renderSelectionValue = () => {
@@ -113,6 +115,131 @@ class GoogleAccount extends Component{
             {this.state.endDate.format("YYYY-MM-DD")}
           </Fragment>
         );
+    }
+
+    getAudience = () => {
+      if(this.state.errorLoading === true){
+            return (
+                <div className="ui three column centered grid">
+                    <div className="ui centered row">
+                        <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            if(this.state.audienceMetrics.length === 0 && this.state.acquisitionMetrics.length === 0 && this.state.behaviorMetrics.length === 0){
+              return (
+                <div className="ui active centered inline text loader">
+                  Fetching analytics
+                </div>
+              )
+            }
+            else{
+              return(
+              <div className="ui cards">
+                 {
+                   audience.map(metric => {
+                       return (                                
+                           <MetricCard 
+                               state={this.state.audienceMetrics} 
+                               metric={metric}
+                               startDate={this.state.startDate}
+                               endDate={this.state.endDate}
+                               key={metric}
+                           />    
+                       )
+                   })
+                 }
+             </div>
+             )
+            }       
+        }
+    }
+
+    getAcquisition = () => {
+        if(this.state.errorLoading === true){
+            return (
+                <div className="ui three column centered grid">
+                    <div className="ui centered row">
+                        <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            if(this.state.audienceMetrics.length === 0 && this.state.acquisitionMetrics.length === 0 && this.state.behaviorMetrics.length === 0){
+              return (
+                <div className="ui active centered inline text loader">
+                  Fetching analytics
+                </div>
+              )
+            }
+            else{
+              return(
+              <BarChart
+                width={900}
+                height={300}
+                data={this.state.acquisitionMetrics}
+                margin={{
+                  top: 20, right: 5, left: 0, bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date_retrieved" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="direct" stackId="a" fill="#8884d8" />
+                <Bar dataKey="social" stackId="a" fill="#82ca9d" />
+                <Bar dataKey="referral" stackId="a" fill="#3FEEE6" />
+                <Bar dataKey="organic_search" stackId="a" fill="#190061" />
+                <Bar dataKey="other" stackId="a" fill="#82cd7d" />
+              </BarChart>
+             )
+            }       
+        }
+    }
+
+    getBehavior = () => {
+        if(this.state.errorLoading === true){
+            return (
+                <div className="ui three column centered grid">
+                    <div className="ui centered row">
+                        <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            if(this.state.audienceMetrics.length === 0 && this.state.acquisitionMetrics.length === 0 && this.state.behaviorMetrics.length === 0){
+              return (
+                <div className="ui active centered inline text loader">
+                  Fetching analytics
+                </div>
+              )
+            }
+            else{
+              return(
+                <table className="ui striped table">
+                    <thead>
+                        <tr>
+                          <th>Page</th>
+                          <th>Pageviews</th>
+                          <th>% Pageviews</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        this.state.behaviorMetrics.map((metric,i) => {
+                            return <PagePath props={metric} total={this.state.pageviewsTotal} key={i}/>
+                        })
+                    }
+                    </tbody>
+                </table>
+             )
+            }       
+        }
     }
 
 	render(){
@@ -167,26 +294,7 @@ class GoogleAccount extends Component{
           </div>
           <div className="row">
               {
-                  this.state.audienceMetrics.length === 0? 
-                      <div className="ui active centered inline text loader">
-                          Fetching analytics
-                     </div>
-                     :
-                     <div className="ui cards">
-                         {
-                             audience.map(metric => {
-                                 return (                                
-                                     <MetricCard 
-                                         state={this.state.audienceMetrics} 
-                                         metric={metric}
-                                         startDate={this.state.startDate}
-                                         endDate={this.state.endDate}
-                                         key={metric}
-                                     />    
-                                 )
-                             })
-                         }
-                     </div>
+                  this.getAudience()
               }
           </div>
           <div className="six column row">
@@ -207,30 +315,7 @@ class GoogleAccount extends Component{
           </div>
           <div className="row">
               {
-                  this.state.acquisitionMetrics.length === 0? 
-                     <div className="ui active centered inline text loader">
-                          Fetching analytics
-                     </div>
-                     :
-                     <BarChart
-                      width={900}
-                      height={300}
-                      data={this.state.acquisitionMetrics}
-                      margin={{
-                        top: 20, right: 5, left: 0, bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date_retrieved" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="direct" stackId="a" fill="#8884d8" />
-                      <Bar dataKey="social" stackId="a" fill="#82ca9d" />
-                      <Bar dataKey="referral" stackId="a" fill="#3FEEE6" />
-                      <Bar dataKey="organic_search" stackId="a" fill="#190061" />
-                      <Bar dataKey="other" stackId="a" fill="#82cd7d" />
-                    </BarChart>
+                  this.getAcquisition()
               }
           </div>
           <div className="eight column row">
@@ -252,22 +337,9 @@ class GoogleAccount extends Component{
               </div>
           </div>
           <div className="row">
-              <table className="ui striped table">
-                  <thead>
-                      <tr>
-                        <th>Page</th>
-                        <th>Pageviews</th>
-                        <th>% Pageviews</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                  {
-                      this.state.behaviorMetrics.map((metric,i) => {
-                          return <PagePath props={metric} total={this.state.pageviewsTotal} key={i}/>
-                      })
-                  }
-                  </tbody>
-              </table>
+            {
+              this.getBehavior()
+            }
           </div>
 			</Fragment>
 		)

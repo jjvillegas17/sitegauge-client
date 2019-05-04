@@ -10,7 +10,7 @@ class UploadAnalytics extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            type: 0,
+            type: '',
             file: '',
             accounts: [],
             pages: [],
@@ -31,7 +31,6 @@ class UploadAnalytics extends Component {
         formData.append('file', this.state.file);
 
         this.setState({loading: true});
-        console.log(formData);
         if(this.state.type === 2){
             await axios.post(`https://sitegauge.io/api/twitter/${id}/upload`,
                 formData,
@@ -42,21 +41,57 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
-                console.log(response.data);
             })
             .catch((error) => { 
                 console.log(error); 
             });
         }
-        window.location.href = "/dashboard";
+        else if(this.state.type === 1){
+            console.log(id);
+            await axios.post(`https://sitegauge.io/api/fb/${id}/upload`,
+                formData,
+                {
+                    headers:{
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+              )
+            .then((response) => {
+            })
+            .catch((error) => { 
+                console.log(error); 
+            });
+        }
+        else{
+            const m = this.refs.metric.value;
+            console.log(`https://sitegauge.io/api/google/${id}/upload/${m}`);
+            await axios.post(`https://sitegauge.io/api/google/${id}/upload/${m}`,
+                formData,
+                {
+                    headers:{
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+              )
+            .then((response) => {
+                this.setState({loading: false});
+            })
+            .catch((error) => { 
+                console.log(error); 
+            });   
+        }
+
+        if(this.state.type !== 0){
+            window.location.href = "/dashboard";    
+        }
     }
 
     changeType = (e) => {
-        if(e.target.value === 0){
-
-        }
-        else if(e.target.value === 1){
-
+        if(e.target.value === "0"){
+            this.getGAccounts();
+        }    
+        else if(e.target.value === "1"){
+            this.getPages();
         }
         else{
             this.getTwitterAccts();
@@ -64,11 +99,32 @@ class UploadAnalytics extends Component {
         this.setState({type: parseInt(e.target.value,10)});
     }
 
+    getGAccounts = () => {
+        const userId = localStorage.getItem("userId");
+        axios.get(`https://sitegauge.io/api/google/${userId}/accounts`)
+            .then((res) => {
+                this.setState({ gaccounts: res.data});
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    getPages = () => {
+        const userId = localStorage.getItem("userId");
+        axios.get(`https://sitegauge.io/api/fb/${userId}/pages`)
+            .then((res) => {
+                this.setState({ pages: res.data});
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     getTwitterAccts = () => {
         const userId = localStorage.getItem("userId");
         axios.get(`https://sitegauge.io/api/twitter/${userId}/accounts`)
             .then((res) => {
-                console.log(res);
                 this.setState({ accounts: res.data});
             })
             .catch((err) => {
@@ -77,16 +133,27 @@ class UploadAnalytics extends Component {
     }
 
     getAccounts = () => {
-        if(this.state.accounts.length !== 0){
-            return (this.state.accounts.map(account => {
+        let accts;
+        if(this.state.type === 0){
+            accts = this.state.gaccounts;
+        }
+        else if(this.state.type === 1){
+            accts = this.state.pages;
+        }
+        else{
+            accts = this.state.accounts;
+        }
+
+        if(accts.length !== 0){
+            return (accts.map(account => {
                 if(this.state.type === 2){
                     return <option value={account.id} key={account.id}>@{account.username}</option>
                 }
                 else if(this.state.type === 1){
                     return <option value={account.id} key={account.id}>{account.page_name}</option>
                 }
-                else{ // google
-
+                else{
+                    return <option value={account.profile_id} key={account.profile_id}>{account.profile_name}</option> 
                 } 
             }
             ));
@@ -129,6 +196,7 @@ class UploadAnalytics extends Component {
                                         <select className="ui fluid dropdown"
                                             onChange={this.changeType}
                                         >
+                                            <option value="none" selected>Select Type</option>;
                                             <option value="0">Google</option>
                                             <option value="1">Facebook</option>
                                             <option value="2">Twitter</option>
@@ -138,13 +206,33 @@ class UploadAnalytics extends Component {
                                         <div className="row">
                                             <strong>Accounts</strong>
                                             <select className="ui fluid dropdown" 
-                                                ref="account" 
-                                                onChange={this.handleAccountChange}
+                                                ref="account"
                                             >
                                                 {this.getAccounts()}
                                             </select>
                                         </div>
                                     </div>
+                                    { this.state.type === 0?
+                                        <div className="field">
+                                            <div className="row">
+                                                <strong>Metric</strong>
+                                                <select className="ui fluid dropdown" 
+                                                    ref="metric"
+                                                >
+                                                   <option value="Users">Users</option>
+                                                   <option value="Sessions">Sessions</option>
+                                                   <option value="New Users">New Users</option>
+                                                   <option value="Sessions Per User">Sessions Per User</option>
+                                                   <option value="Pageviews">Pageviews</option>
+                                                   <option value="Pages Per Session">Pages Per Session</option>
+                                                   <option value="Avg Session Duration">Avg Session Duration</option>
+                                                   <option value="Bounce Rate">Bounce Rate</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        :
+                                        null
+                                    }
                                     <div className="field">
                                         <div className="row">
                                             <label htmlFor="file" className="ui icon button">

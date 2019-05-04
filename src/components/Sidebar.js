@@ -15,21 +15,14 @@ class Sidebar extends Component {
                 minHeight: "100vh"
             }}>
                 <br />
+                <span style={{fontSize: "17px"}}>
                 <Menu.Item as={Link} to='/dashboard'>
-                    <i className="home icon"></i>
+                    <i className="industry icon"></i>
                     Dashboard
                 </Menu.Item>
-                <Menu.Item as={Link} to='/dashboard'>
-                    <i className="google icon"></i>
-                    Google
-                </Menu.Item>
-                <Menu.Item as={Link} to='/dashboard'>
-                    <i className="facebook icon"></i>
-                    Facebook
-                </Menu.Item>
-                <Menu.Item as={Link} to='/dashboard'>
-                    <i className="twitter icon"></i>
-                    Twitter
+                <Menu.Item as={Link} to='/insights'>
+                    <i className="lightbulb icon"></i>
+                    Insights
                 </Menu.Item>
                 <Menu.Item as={Link} to='/upload'>
                     <i className="upload icon"></i>
@@ -37,16 +30,17 @@ class Sidebar extends Component {
                 </Menu.Item>
                 <Menu.Item as={Link} to='/addWebsite'>
                     <i className="add icon"></i>
-                    Add a Website
+                    Add Website
                 </Menu.Item>
                 <Menu.Item as={Link} to='/addSM'>
                     <i className="add icon"></i>
-                    Add a Social Media
+                    Add Social Media
                 </Menu.Item>
                 <Menu.Item as={Link} to='/dashboard'>
                     <i className="minus icon"></i>
                     Delete an account
                 </Menu.Item>
+                </span>
             </Menu>
         </div>
                   

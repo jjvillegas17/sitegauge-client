@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import MetricCard from './MetricCard';
+import { Message } from 'semantic-ui-react'
 import DateRangePicker from "react-daterange-picker";
 import "react-daterange-picker/dist/css/react-calendar.css";
 import axios from 'axios';
@@ -25,10 +26,10 @@ class FacebookPage extends Component{
             pageToken: props.token,
             pageMetrics: [],
             isOpen: false,
-            startDate: today.clone().subtract(10, "days"),
-            endDate: today.clone().subtract(3, "days"),
-            minDate: today.clone().subtract(10, "days"),
-            maxDate: today.clone().subtract(3, "days"),
+            startDate: today.clone().subtract(8, "days"),
+            endDate: today.clone().subtract(1, "days"),
+            minDate: today.clone().subtract(8, "days"),
+            maxDate: today.clone().subtract(1, "days"),
             errorLoading: false,
         }
     }
@@ -38,7 +39,7 @@ class FacebookPage extends Component{
       if(this.state.pageMetrics.length !== 0){
         this.state.pageMetrics.forEach((metric) => {
           const m = Object.assign({}, metric);
-          delete m.created_at; delete m.updated_at; delete m.id;
+          delete m.created_at; delete m.updated_at; delete m.id; delete m.uploader_id;
           metrics.push(m);
         })
         console.log(metrics);
@@ -51,9 +52,7 @@ class FacebookPage extends Component{
     async componentDidMount(){
         try{
             const metrics =  await this.updateMetricsDb();
-            console.log(metrics);
         } catch(error){
-            console.log("error");
             this.setState({errorLoading: true});
         }
 
@@ -106,7 +105,12 @@ class FacebookPage extends Component{
         // of D.js, then check in D.js if error loading and output a modal
         if(this.state.errorLoading === true){
             return (
-                <h3 className="ui header"> Could not fetch analytics data. Try reloading</h3>
+                <div className="ui three column centered grid">
+                    <div className="ui centered row">
+                        <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
+                    </div>
+                </div>
+
             )
         }
         else{

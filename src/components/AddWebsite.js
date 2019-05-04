@@ -12,6 +12,8 @@ class AddWebsite extends Component {
     state = {
         token: '',
         refreshToken: '',
+        created: '',
+        expiresIn: '',
         accounts: [],
         account: '',
         property: '',
@@ -34,11 +36,12 @@ class AddWebsite extends Component {
 
     async componentDidMount(){
         const qs = queryString.parse(this.props.location.search);
+        console.log(qs);
         if(Object.keys(qs).length === 0){
             return
         }
 
-        axios.get(`https://sitegauge.io/api/google/get-accounts?token=${qs.token}`)
+        axios.get(`https://sitegauge.io/api/google/get-accounts?token=${qs.access_token}`)
             .then((res) => {
                 this.setState({
                     accounts: res.data, 
@@ -51,7 +54,9 @@ class AddWebsite extends Component {
                 console.log(err);
             })
 
-        this.setState({ token: qs.token, refreshToken: qs.refreshToken, email: qs.email });
+        this.setState({ token: qs.access_token, refreshToken: qs.refresh_token, email: qs.email,
+                expiresIn: parseInt(qs.expires_in, 10) , created: qs.created
+         });
     }
 
     changeAccount = (e) => {
@@ -86,6 +91,8 @@ class AddWebsite extends Component {
             email: this.state.email,
             token: this.state.token,
             refreshToken: this.state.refreshToken,
+            created: this.state.created,
+            expiresIn: this.state.expiresIn
         })
             .then(res => console.log(res))
             .catch(err => console.log(err));
