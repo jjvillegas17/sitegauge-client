@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
+import { Message } from 'semantic-ui-react';
 import axios from 'axios';
 import queryString from 'query-string';
 
@@ -20,7 +21,9 @@ class AddWebsite extends Component {
         property: '',
         profile: '',
         email:'',
-        loading: false,
+        loading: false,      
+        errorFetching: false,
+        errorSaving: false,
     }
 
     handleLogin = (e) => {
@@ -52,6 +55,7 @@ class AddWebsite extends Component {
                 });
             })
             .catch((err) => {
+                this.setState({errorFetching: true})
                 console.log(err);
             })
 
@@ -60,8 +64,7 @@ class AddWebsite extends Component {
          });
     }
 
-    changeAccount = (e) => {
-        console.log(JSON.parse(e.target.value));
+    changeAccount = (e) => {        
         const account = JSON.parse(e.target.value);
         // const account = this.state.accounts.find(obj => {
         //   return obj.accountId === e.target.value
@@ -81,8 +84,12 @@ class AddWebsite extends Component {
 
     save = async (e) => {
         e.preventDefault();
+
+        const userId = localStorage.getItem("userId");
+        
         this.setState({loading: true});
-        await axios.post(`https://sitegauge.io/api/google/add-account`, {
+        
+        await axios.post(`https://sitegauge.io/api/google/${userId}/add-account`, {
             dateCreated:this.state.property.dateCreated,
             profileId: this.state.profile.profileId,
             profileName: this.state.profile.profileName,
@@ -95,17 +102,21 @@ class AddWebsite extends Component {
             created: this.state.created,
             expiresIn: this.state.expiresIn
         })
-            .then(res => console.log(res))
-            .catch(err => console.log(err));
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({errorSaving: true, loading: false}); 
+            });
 
-        console.log(this.state.profile.profileId);
-        console.log(this.state.token);
         await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-acquisition-metrics?token=${this.state.token}`)
             .then((response) => {
                 console.log(response);
             })
             .catch((error) => { 
-                console.log(error); 
+                console.log(error);
+                this.setState({errorSaving: true, loading: false});  
             });
 
         await axios.get(`https://sitegauge.io/api/google/${userId}/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
@@ -113,7 +124,8 @@ class AddWebsite extends Component {
                 console.log(response);
             })
             .catch((error) => { 
-                console.log(error); 
+                console.log(error);
+                this.setState({errorSaving: true, loading: false});  
             });
 
         await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-behavior-metrics?token=${this.state.token}`)
@@ -121,14 +133,42 @@ class AddWebsite extends Component {
                 console.log(response);
             })
             .catch((error) => { 
-                console.log(error); 
+                console.log(error);
+                this.setState({errorSaving: true, loading: false});  
             });
 
-        window.location.href = "/dashboard";    
+        if(this.state.errorSaving === false){
+            window.location.href = "/dashboard";            
+        }   
     }
 
+    renderError() {
+        if(this.state.errorSaving === true){
+            return(
+                <div className="ui three column centered grid">
+                    <div className="ui centered row" style={{marginTop: "-30px", marginBottom: "10px"}}>
+                        <Message negative floating style={{ width: "350px"}}>Error saving! Please try again.</Message>
+                    </div>
+                </div>
+            )
+        }
+        else if(this.state.errorFetching === true){
+            return(
+                <div className="ui three column centered grid">
+                    <div className="ui centered row" style={{marginTop: "-30px", marginBottom: "10px"}}>
+                        <Message negative floating style={{ width: "350px"}}>Error getting account! Please try again.</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            return (null)
+        }
+    }
+
+
+
     render() {
-        console.log(this.state);
         return (
             <div>
                 <Menu />
@@ -155,6 +195,9 @@ class AddWebsite extends Component {
                                     </h1>
                                 </div>
                                 <div className="ui raised very padded text container segment">
+                                {
+                                    this.renderError()
+                                }
                                    <button className="ui facebook button"
                                        onClick={this.handleLogin}
                                    >

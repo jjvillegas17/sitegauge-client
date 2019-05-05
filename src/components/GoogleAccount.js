@@ -34,15 +34,15 @@ class GoogleAccount extends Component{
 
 		this.state = {
 			audienceMetrics: [],
-            behaviorMetrics: [],
-            pageviewsTotal: 0,
-            acquisitionMetrics: [],
-            isOpen: false,
-            startDate: today.clone().subtract(10, "days"),
-            endDate: today.clone().subtract(3, "days"),
-            minDate: moment(props.data.date_created),
-            maxDate: today,
-            errorLoading: false,
+      behaviorMetrics: [],
+      pageviewsTotal: 0,
+      acquisitionMetrics: [],
+      isOpen: false,
+      startDate: today.clone().subtract(10, "days"),
+      endDate: today.clone().subtract(3, "days"),
+      minDate: moment(props.data.date_created),
+      maxDate: today,
+      errorLoading: false,
 		}
 	}
 
@@ -101,15 +101,15 @@ class GoogleAccount extends Component{
     }
 
     updateAudienceMetricsDb = () => {
-        return axios.get(`https://sitegauge.io/api/google/${userId}/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
+        return axios.get(`https://sitegauge.io/api/google/${userId}/${this.props.data.profile_id}/get-audience-metrics?token=${this.state.token}`);
     } 
 
     updateAcquisitionMetricsDb = () => {
-        return axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-acquisition-metrics?token=${this.state.token}`)
+        return axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/get-acquisition-metrics?token=${this.state.token}`);
     } 
 
     updateBehaviorMetricsDb = () => {
-        return axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-behavior-metrics?token=${this.state.token}`)
+        return axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/get-behavior-metrics?token=${this.state.token}`);
     } 
 
     onSelect = (date, states) => {
