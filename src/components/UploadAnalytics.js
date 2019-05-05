@@ -6,6 +6,8 @@ import axios from 'axios';
    identify which is to be rendered in the content part
 */
 
+const userId = localStorage.getItem("userId");
+
 class UploadAnalytics extends Component {
     constructor(props) {
         super(props);
@@ -32,7 +34,7 @@ class UploadAnalytics extends Component {
 
         this.setState({loading: true});
         if(this.state.type === 2){
-            await axios.post(`https://sitegauge.io/api/twitter/${id}/upload`,
+            await axios.post(`https://sitegauge.io/api/twitter/${userId}/${id}/upload`,
                 formData,
                 {
                     headers:{
@@ -41,6 +43,7 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
+                console.log(response);
             })
             .catch((error) => { 
                 console.log(error); 
@@ -48,7 +51,7 @@ class UploadAnalytics extends Component {
         }
         else if(this.state.type === 1){
             console.log(id);
-            await axios.post(`https://sitegauge.io/api/fb/${id}/upload`,
+            await axios.post(`https://sitegauge.io/api/fb/${userId}/${id}/upload`,
                 formData,
                 {
                     headers:{
@@ -57,6 +60,7 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
+                console.log(response);
             })
             .catch((error) => { 
                 console.log(error); 
@@ -64,8 +68,7 @@ class UploadAnalytics extends Component {
         }
         else{
             const m = this.refs.metric.value;
-            console.log(`https://sitegauge.io/api/google/${id}/upload/${m}`);
-            await axios.post(`https://sitegauge.io/api/google/${id}/upload/${m}`,
+            await axios.post(`https://sitegauge.io/api/google/${userId}/${id}/upload/${m}`,
                 formData,
                 {
                     headers:{
@@ -74,6 +77,7 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
+                console.log(response);
                 this.setState({loading: false});
             })
             .catch((error) => { 
@@ -81,9 +85,9 @@ class UploadAnalytics extends Component {
             });   
         }
 
-        if(this.state.type !== 0){
-            window.location.href = "/dashboard";    
-        }
+        // if(this.state.type !== 0){
+        //     window.location.href = "/dashboard";    
+        // }
     }
 
     changeType = (e) => {

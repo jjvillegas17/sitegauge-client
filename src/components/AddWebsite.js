@@ -7,6 +7,7 @@ import queryString from 'query-string';
 /* make a home component then accept a props that will
    identify which is to be rendered in the content part
 */
+const userId = localStorage.getItem("userId");
 
 class AddWebsite extends Component {
     state = {
@@ -107,7 +108,7 @@ class AddWebsite extends Component {
                 console.log(error); 
             });
 
-        await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
+        await axios.get(`https://sitegauge.io/api/google/${userId}/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
             .then((response) => {
                 console.log(response);
             })

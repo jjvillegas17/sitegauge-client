@@ -33,16 +33,26 @@ const MetricCard = (props) => {
 	            	{props.startDate.format("YYYY-MM-DD")} - {props.endDate.format("YYYY-MM-DD")}
 	            </h5>
 	        </div>
-	        <div className="content" style={{ marginLeft: "-25px" }}>
-	            <LineChart width={280} height={250} data={props.state}
-	              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-	              <CartesianGrid strokeDasharray="3 3" />
-	              <XAxis dataKey="date_retrieved"/>
-	              <YAxis />
-	              <Tooltip />
-	              <Line type="monotone" name={transformStr(props.metric)} dataKey={props.metric} stroke="#8884d8" />
-	            </LineChart>
-	        </div>
+	        {
+	        	props.state.length === 0? 
+	        	<div className="ui centered grid">
+	        		<div className="ui row">
+	        			There are no metrics that can be fetched in this date.
+	        		</div>
+	        	</div>
+	        	:
+	        	<div className="content" style={{ marginLeft: "-25px" }}>
+		            <LineChart width={280} height={250} data={props.state}
+		              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+		              <CartesianGrid strokeDasharray="3 3" />
+		              <XAxis dataKey="date_retrieved"/>
+		              <YAxis />
+		              <Tooltip />
+		              <Line type="monotone" name={transformStr(props.metric)} dataKey={props.metric} stroke="#8884d8" />
+		            </LineChart>
+		        </div>
+
+	        }
 	    </div>
     )
 } 

@@ -3,6 +3,7 @@ import TweetMetric from './TweetMetric';
 import { CSVLink } from "react-csv";
 import axios from 'axios';
 
+const userId = localStorage.getItem("userId");
 
 class TwitterAccount extends Component{
     constructor(props) {
@@ -26,7 +27,6 @@ class TwitterAccount extends Component{
           m.text = m.text.split("\n").join(" ");
           metrics.push(m);
         })
-        console.log(metrics);
         return metrics;        
       }
 
@@ -38,7 +38,7 @@ class TwitterAccount extends Component{
     }
 
     fetchMetrics = () => {
-        axios.get(`https://sitegauge.io/api/twitter/${this.state.id}/tweet-metrics`)
+        axios.get(`https://sitegauge.io/api/twitter/${userId}/${this.state.id}/tweet-metrics`)
             .then((res) => {
                 // console.log(res.data);
                 this.setState({tweetMetrics: res.data});

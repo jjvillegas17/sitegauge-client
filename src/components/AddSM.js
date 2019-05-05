@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
+import { Message } from 'semantic-ui-react';
 import FacebookLogin from 'react-facebook-login';
 import axios from 'axios';
 import queryString from 'query-string';
@@ -16,6 +17,8 @@ class AddSM extends Component {
             errorLogIn: '',
             fbData: '',
             loading: false,
+            errorSaving: false,
+            errorFetching: false,
         }
     }
 
@@ -50,7 +53,8 @@ class AddSM extends Component {
                     pages: response.data
                 });
             })
-            .catch((error) => { 
+            .catch((error) => {
+                this.setState({ errorFetching: true }); 
                 console.log(error); 
             });
     }                    
@@ -71,7 +75,8 @@ class AddSM extends Component {
                 //     pages: response.data
                 // });
             })
-            .catch((error) => { 
+            .catch((error) => {
+                this.setState({ errorFetching: false }); 
                 console.log(error); 
             });
     }
@@ -102,7 +107,15 @@ class AddSM extends Component {
 
     save = async (event) => {
         event.preventDefault();
-        this.setState({loading: true});
+
+        const userId = localStorage.getItem("userId");
+        
+        this.setState({ loading: true });
+
+        if(this.refs.page.value === "none"){
+            this.setState({errorSaving: true, loading: false});
+            return;
+        }
         const acct = this.state.type === 0 ?  
             {
                 pageId: this.findPage().id,
@@ -122,19 +135,18 @@ class AddSM extends Component {
             }
         
         const url = this.state.type === 0 ? 
-            "https://sitegauge.io/api/fb/add-page" 
+            `https://sitegauge.io/api/fb/${userId}/add-page` 
             : 
-            "https://sitegauge.io/api/twitter/add-account";
+            `https://sitegauge.io/api/twitter/${userId}/add-account`;
          
         await axios.post(url,
             acct,
           )
         .then((response) => {
             console.log(response);
-            // save accounts of user to localstorage if only there's no error
-            this.appendAcct(this.state.type===0? acct.pageId : acct.id);
         })
         .catch((error) => { 
+            this.setState({errorSaving: true, loading: false });
             console.log(error); 
         });
 
@@ -142,35 +154,61 @@ class AddSM extends Component {
             console.log(acct.pageId);
             await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
             .then((response) => {
+                this.setState({errorSaving: false});
                 console.log(response);
             })
-            .catch((error) => { 
+            .catch((error) => {
+                this.setState({errorSaving: true, loading: false}); 
                 console.log(error); 
             });    
         }
+        else{
+            this.setState({errorSaving: false});
+        }
 
-        // window.location.href = "/dashboard";
+        if(this.state.errorSaving === false){
+            window.location.href = "/dashboard";            
+        }
 
     }
 
     getAccounts = () => {
         if(this.state.type === 1 && this.state.accounts.length !== 0){
-            console.log(1);
             return <option value="this.state.accounts.id" selected>@{this.state.accounts.username}</option>;
         }
         else if (this.state.type === 0 && this.state.pages.length !== 0){
-            console.log(2);
             return (this.state.pages.map(function(object, i){
                 return <option value={object.id} key={i}>{object.name}</option>
             })
             );
         }
         else{
-            console.log(3)
             return <option value="none" selected>Select Account</option>;
         }
     }
-
+    renderError() {
+        if(this.state.errorSaving === true){
+            return(
+                <div className="ui three column centered grid">
+                    <div className="ui centered row" style={{marginTop: "-30px", marginBottom: "10px"}}>
+                        <Message negative floating style={{ width: "350px"}}>Error saving! Please try again.</Message>
+                    </div>
+                </div>
+            )
+        }
+        else if(this.state.errorFetching === true){
+            return(
+                <div className="ui three column centered grid">
+                    <div className="ui centered row" style={{marginTop: "-30px", marginBottom: "10px"}}>
+                        <Message negative floating style={{ width: "350px"}}>Error getting account! Please try again.</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            return (null)
+        }
+    }
     render() {
         return (
             <div>
@@ -198,6 +236,9 @@ class AddSM extends Component {
                                     </h1>
                                 </div>
                                 <div className="ui raised very padded text container segment">
+                                {
+                                    this.renderError()
+                                }
                                     <form className="ui form">
                                         <div className="field">
                                             <label>Type</label>

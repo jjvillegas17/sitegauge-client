@@ -24,6 +24,8 @@ const moment = extendMoment(originalMoment);
 const audience = ['sessions', 'users', 'new_users', 'sessions_per_user', 
             'pageviews', 'pages_per_session', 'avg_session_duration', 'bounce_rate'];
 
+const userId = localStorage.getItem("userId");
+
 class GoogleAccount extends Component{
 	constructor(props){
 		super(props);
@@ -73,9 +75,42 @@ class GoogleAccount extends Component{
 
   }
 
-	async componentDidMount(){
+	  async componentDidMount(){
+        try{
+          this.updateAudienceMetricsDb();
+        }
+        catch(error){
+          console.log(error);
+        }
+
+        try{
+          this.updateAcquisitionMetricsDb();
+        }
+        catch(error){
+          console.log(error);
+        }
+
+        try{
+          this.updateBehaviorMetricsDb();
+        }
+        catch(error){
+          console.log(error);
+        }
+
         await this.fetchMetrics();
     }
+
+    updateAudienceMetricsDb = () => {
+        return axios.get(`https://sitegauge.io/api/google/${userId}/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
+    } 
+
+    updateAcquisitionMetricsDb = () => {
+        return axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-acquisition-metrics?token=${this.state.token}`)
+    } 
+
+    updateBehaviorMetricsDb = () => {
+        return axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-behavior-metrics?token=${this.state.token}`)
+    } 
 
     onSelect = (date, states) => {
         this.fetchMetrics(date.start, date.end);
@@ -93,7 +128,7 @@ class GoogleAccount extends Component{
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
 
         try{
-          const metrics = await axios.get(`https://sitegauge.io/api/google/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`);
+          const metrics = await axios.get(`https://sitegauge.io/api/google/${userId}/${this.props.data.profile_id}/fetch-metrics?start=${start}&end=${end}`);
           console.log(metrics);
           this.setState({audienceMetrics: Object.values(metrics.data.audience),
                   acquisitionMetrics: Object.values(metrics.data.acquisition),

@@ -10,7 +10,6 @@ import { extendMoment } from "moment-range";
 
 const moment = extendMoment(originalMoment);
 
-
 const pm = ['views', 'impressions', 'engagements', 'posts_engagements', 
             'content_activity', 'negative_feedback', 'new_likes', 'video_views'];
 
@@ -31,6 +30,7 @@ class FacebookPage extends Component{
             minDate: today.clone().subtract(8, "days"),
             maxDate: today.clone().subtract(1, "days"),
             errorLoading: false,
+            fetching: true,
         }
     }
 
@@ -42,7 +42,6 @@ class FacebookPage extends Component{
           delete m.created_at; delete m.updated_at; delete m.id; delete m.uploader_id;
           metrics.push(m);
         })
-        console.log(metrics);
         return metrics;        
       }
 
@@ -50,17 +49,35 @@ class FacebookPage extends Component{
     }
 
     async componentDidMount(){
+        const userId = localStorage.getItem("userId");
+
         try{
             const metrics =  await this.updateMetricsDb();
+            // if(metrics.data.toRepeat === true){
+            //     metrics =  await this.updateMetricsDb();
+            // }
         } catch(error){
             this.setState({errorLoading: true});
         }
 
-        const minDate = await this.getMinDate(this.state.pageId);
-        const fetchMetrics = await this.fetchMetrics();
-
-        this.setState({ minDate: new Date(minDate.data.data)});
-        this.setState({pageMetrics: Object.values(fetchMetrics.data.data.page_metrics)});
+        let minDate;
+        try{
+            minDate = await this.getMinDate(this.state.pageId);
+            console.log(minDate.data.data);
+        }
+        catch(err){
+            console.log(err);
+        }
+        
+        let fetchMetrics;
+        try{
+            fetchMetrics = await this.fetchMetrics();
+            this.setState({fetching: false});
+        } catch(error){
+            console.log(error);
+        }
+        
+        this.setState({minDate: new Date(minDate.data.data), pageMetrics: Object.values(fetchMetrics.data.page_metrics)});
     }
 
     updateMetricsDb = () => {
@@ -72,13 +89,15 @@ class FacebookPage extends Component{
               startD.format("YYYY-MM-DD") : this.state.startDate.format("YYYY-MM-DD");
         const end = typeof  endD !== 'undefined' ? 
               endD.format("YYYY-MM-DD") : this.state.endDate.format("YYYY-MM-DD");
+        
+        const userId = localStorage.getItem("userId");
 
-        // add userId to params & dynamic fb page id
-        return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/fetch-metrics?start=${start}&end=${end}`)
+        return axios.get(`https://sitegauge.io/api/fb/${userId}/${this.state.pageId}/fetch-metrics?start=${start}&end=${end}`)
     }
 
     getMinDate = (pageId) => {
-        return axios.get(`https://sitegauge.io/api/fb/${pageId}/min-date`)
+        const userId = localStorage.getItem("userId");
+        return axios.get(`https://sitegauge.io/api/fb/${userId}/${pageId}/min-date`)
     }
 
     onToggle = () => {
@@ -86,9 +105,16 @@ class FacebookPage extends Component{
     }
 
     onSelect = async (date, states) => {
-        const metrics = await this.fetchMetrics(date.start, date.end);
-        this.setState({ pageMetrics: Object.values(metrics.data.data.page_metrics) });
-        this.setState({  startDate: date.start, endDate: date.end });
+        let metrics;
+        try{
+            metrics = await this.fetchMetrics(date.start, date.end);
+            this.setState({fetching: false});
+        } catch(err){
+
+        }
+        
+        await this.setState({ pageMetrics: Object.values(metrics.data.page_metrics) });
+        await this.setState({  startDate: date.start, endDate: date.end });
     }
 
     renderSelectionValue = () => {
@@ -110,12 +136,11 @@ class FacebookPage extends Component{
                         <Message negative floating style={{ width: "350px"}}>Error loading! Please refresh</Message>
                     </div>
                 </div>
-
             )
         }
         else{
             return (
-                this.state.pageMetrics.length === 0? 
+                this.state.fetching === true? 
                 <div className="ui active centered inline text loader">
                     Fetching analytics
                </div>
