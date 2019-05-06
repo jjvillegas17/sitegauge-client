@@ -8,7 +8,6 @@ import queryString from 'query-string';
 /* make a home component then accept a props that will
    identify which is to be rendered in the content part
 */
-const userId = localStorage.getItem("userId");
 
 class AddWebsite extends Component {
     state = {

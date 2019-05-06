@@ -49,10 +49,9 @@ class FacebookPage extends Component{
     }
 
     async componentDidMount(){
-        const userId = localStorage.getItem("userId");
 
         try{
-            const metrics =  await this.updateMetricsDb();
+            await this.updateMetricsDb();
             // if(metrics.data.toRepeat === true){
             //     metrics =  await this.updateMetricsDb();
             // }

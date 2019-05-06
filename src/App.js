@@ -7,6 +7,7 @@ import AddWebsite from './components/AddWebsite';
 import Profile from './components/Profile';
 import AddSM from './components/AddSM';
 import Insights from './components/Insights';
+import DeleteAccount from './components/DeleteAccount';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -18,11 +19,12 @@ class App extends Component {
           <Route path="/" component={Login} exact />
           <Route path="/signup" component={Signup} exact />
           <ProtectedRoute exact path="/dashboard" component={D}/>
-          <Route path="/insights" component={Insights} exact />
-          <Route path="/upload" component={UploadAnalytics} exact />
-          <Route path="/addWebsite" component={AddWebsite} exact />
+          <ProtectedRoute exact path="/insights" component={Insights} />
+          <ProtectedRoute exact path="/delete" component={DeleteAccount} />
+          <ProtectedRoute exact path="/upload" component={UploadAnalytics} />
+          <ProtectedRoute exact path="/addWebsite" component={AddWebsite} />
           <ProtectedRoute exact path="/addSM" component={AddSM}/>
-          <Route path="/profile" component={Profile} exact />
+          <ProtectedRoute exact path="/profile" component={Profile} />
         </Switch>
       </BrowserRouter>
     );

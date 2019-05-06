@@ -50,7 +50,8 @@ class AddSM extends Component {
         axios.get(`https://sitegauge.io/login/facebook/callback?token=${response.accessToken}`)
             .then((response) => {
                 this.setState({
-                    pages: response.data
+                    pages: response.data,
+                    errorFetching: false,
                 });
             })
             .catch((error) => {

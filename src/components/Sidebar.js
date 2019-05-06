@@ -36,7 +36,7 @@ class Sidebar extends Component {
                     <i className="add icon"></i>
                     Add Social Media
                 </Menu.Item>
-                <Menu.Item as={Link} to='/dashboard'>
+                <Menu.Item as={Link} to='/delete'>
                     <i className="minus icon"></i>
                     Delete an account
                 </Menu.Item>

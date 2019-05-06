@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Sidebar from './Sidebar';
 import Menu from './Menu';
+import { Message } from 'semantic-ui-react';
 import axios from 'axios';
 /* make a home component then accept a props that will
    identify which is to be rendered in the content part
@@ -19,6 +20,7 @@ class UploadAnalytics extends Component {
             gaccounts:[],
             selectedAccount: '',
             loading: false,
+            errorSaving: false,
         }
     }
 
@@ -29,6 +31,12 @@ class UploadAnalytics extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
         const id = this.refs.account.value;
+
+        if(this.refs.account.value === "none"){
+            this.setState({errorSaving: true, loading: false});
+            return;
+        }
+
         let formData = new FormData();
         formData.append('file', this.state.file);
 
@@ -44,9 +52,11 @@ class UploadAnalytics extends Component {
               )
             .then((response) => {
                 console.log(response);
+                this.setState({errorSaving: false});
             })
             .catch((error) => { 
-                console.log(error); 
+                console.log(error);
+                this.setState({ errorSaving: true, loading: false});
             });
         }
         else if(this.state.type === 1){
@@ -61,9 +71,11 @@ class UploadAnalytics extends Component {
               )
             .then((response) => {
                 console.log(response);
+                this.setState({errorSaving: false});
             })
             .catch((error) => { 
-                console.log(error); 
+                console.log(error);
+                this.setState({ errorSaving: true, loading: false});
             });
         }
         else{
@@ -78,16 +90,17 @@ class UploadAnalytics extends Component {
               )
             .then((response) => {
                 console.log(response);
-                this.setState({loading: false});
+                this.setState({errorSaving: false, loading: false});
             })
             .catch((error) => { 
                 console.log(error); 
+                this.setState({ errorSaving: true, loading: false});
             });   
         }
 
-        // if(this.state.type !== 0){
-        //     window.location.href = "/dashboard";    
-        // }
+        if(this.state.type !== 0 && this.state.errorSaving === false){
+            window.location.href = "/dashboard";    
+        }
     }
 
     changeType = (e) => {
@@ -144,8 +157,11 @@ class UploadAnalytics extends Component {
         else if(this.state.type === 1){
             accts = this.state.pages;
         }
-        else{
+        else if(this.state.type === 2){
             accts = this.state.accounts;
+        }
+        else{
+            return (<option value="none" key="none">Select Account</option>);
         }
 
         if(accts.length !== 0){
@@ -164,6 +180,21 @@ class UploadAnalytics extends Component {
         }
         else{
             return <option value="none" selected>Select Account</option>;
+        }
+    }
+
+    renderError() {
+        if(this.state.errorSaving === true){
+            return(
+                <div className="ui three column centered grid">
+                    <div className="ui centered row" style={{marginTop: "-30px", marginBottom: "10px"}}>
+                        <Message negative floating style={{ width: "350px"}}>Error saving! Please try again.</Message>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            return (null);
         }
     }
 
@@ -194,6 +225,9 @@ class UploadAnalytics extends Component {
                                 </h1>
                             </div>
                             <div className="ui raised very padded text container segment">
+                            {
+                                this.renderError()
+                            }
                                 <form className="ui form">
                                     <div className="field">
                                         <label>Type</label>
