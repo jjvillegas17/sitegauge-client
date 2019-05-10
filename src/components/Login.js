@@ -10,8 +10,9 @@ class Login extends Component {
             password: '',
             emailError: '',
             error: '',
+            isAdmin: '',
             toRedirect: false,
-            data: []
+            data: [],
         }
     }
 
@@ -40,36 +41,71 @@ class Login extends Component {
         return true;
     }
 
-    handleLogin = (event) => {
+    handleLogin = async (event) => {
         event.preventDefault();
         const { email, password } = this.state;
 
-        axios.post('https://sitegauge.io/api/login', {
+        let data = [], toRedirect = false, isAdmin = '', isBlocked = ''; 
+        await axios.post('https://sitegauge.io/api/login', {
             email: email,
             password: password
           })
           .then((response) => {
-            // console.log(response.data.data);
-            localStorage.setItem('accessToken', response.data.data.token);
-            localStorage.setItem('userId', response.data.data.user_id);
-            this.setState({
-                data: response.data,
-                toRedirect: true,
-            });
+            console.log(response.data.data);
+            if(response.data.data.is_blocked === 0){
+                localStorage.setItem('accessToken', response.data.data.token);
+                localStorage.setItem('userId', response.data.data.user_id);
+                data = response.data;                
+            }
+            else{
+                isBlocked = 1;
+                this.setState({ error: "This account is blocked by the admin."})
+            }
+
           })
           .catch((error) => {
             this.setState({
                 error: error.response.data.message,
                 toRedirect: false
             });
+
           });
+
+        if(data.length === 0){
+            return;
+        }
+
+        const userId = localStorage.getItem("userId");
+        await axios.get(`https://sitegauge.io/api/${userId}/info`)
+            .then(res => {
+                isAdmin = res.data.is_admin;
+                console.log(isAdmin);
+                localStorage.setItem('x', isAdmin); 
+                toRedirect = true;
+            })
+            .catch(error => {
+                this.setState({
+                    error: error.response.data.message,
+                    toRedirect: false
+                });
+            })
+
+        this.setState({ data: data, toRedirect: toRedirect, isAdmin: isAdmin});
     }
 
     render() {
         if(this.state.toRedirect){
-            return <Redirect to={
-                {pathname: '/dashboard'}
-            }/>;
+            if(this.state.isAdmin === 1){
+                return <Redirect to={
+                    {pathname: '/admin'}
+                }/>;
+            }
+            else{
+                return <Redirect to={
+                    {pathname: '/dashboard'}
+                }/>;    
+            }
+            
         }
 
         return (

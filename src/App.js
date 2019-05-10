@@ -10,8 +10,12 @@ import Insights from './components/Insights';
 import DeleteAccount from './components/DeleteAccount';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
+import Home from './components/Home';
+import DeleteUser from './components/DeleteUser';
+import BlockUser from './components/BlockUser';
+import UnblockUser from './components/UnblockUser';
 
-class App extends Component {
+class App extends Component {   
   render() {
     return (
       <BrowserRouter>
@@ -25,6 +29,10 @@ class App extends Component {
           <ProtectedRoute exact path="/addWebsite" component={AddWebsite} />
           <ProtectedRoute exact path="/addSM" component={AddSM}/>
           <ProtectedRoute exact path="/profile" component={Profile} />
+          <ProtectedRoute exact path="/admin" component={Home} />
+          <ProtectedRoute exact path="/admin/delete" component={DeleteUser} />
+          <ProtectedRoute exact path="/admin/block" component={BlockUser} />
+          <ProtectedRoute exact path="/admin/unblock" component={UnblockUser} />
         </Switch>
       </BrowserRouter>
     );

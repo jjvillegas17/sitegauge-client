@@ -155,13 +155,22 @@ class AddSM extends Component {
             console.log(acct.pageId);
             await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
             .then((response) => {
+                // this.setState({errorSaving: false});
+                console.log(response);
+            })
+            .catch((error) => {
+                this.setState({errorSaving: true, loading: false}); 
+                console.log(error); 
+            });
+            await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics-fans?pageToken=${acct.pageToken}`)
+            .then((response) => {
                 this.setState({errorSaving: false});
                 console.log(response);
             })
             .catch((error) => {
                 this.setState({errorSaving: true, loading: false}); 
                 console.log(error); 
-            });    
+            });        
         }
         else{
             this.setState({errorSaving: false});
