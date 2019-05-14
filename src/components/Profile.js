@@ -17,7 +17,6 @@ class Profile extends Component {
 	async componentDidMount(){
 		axios.get(`https://sitegauge.io/api/${localStorage.getItem("userId")}/accounts`)
 			.then((res) => {
-				console.log(res.data);
 				this.setState({ accounts: res.data});
 			})
 			.catch((err) => {
@@ -26,7 +25,6 @@ class Profile extends Component {
 
 		axios.get(`https://sitegauge.io/api/${localStorage.getItem("userId")}/info`)
 			.then((res) => {
-				console.log(res.data);
 				this.setState({ user: res.data});
 			})
 			.catch((err) => {
@@ -89,9 +87,8 @@ class Profile extends Component {
 								    <tbody>
 									    {
 									    	this.state.accounts.pages.map(page => {
-									    		console.log(page);
 									    		return (
-									    			<tr>
+									    			<tr key={page.id}>
 									    				<td>{page.page_name}</td>
 									    			</tr>
 									    		)
@@ -114,9 +111,8 @@ class Profile extends Component {
 								    <tbody>
 									    {
 									    	this.state.accounts.twitters.map(twitter => {
-									    		console.log(twitter);
 									    		return (
-									    			<tr>
+									    			<tr key={twitter.id}>
 									    				<td>@{twitter.username}</td>
 									    			</tr>
 									    		)
@@ -139,9 +135,8 @@ class Profile extends Component {
 								    <tbody>
 									    {
 									    	this.state.accounts.googles.map(google => {
-									    		console.log(google);
 									    		return (
-									    			<tr>
+									    			<tr key={google.id}>
 									    				<td>{google.property_name}</td>
 									    			</tr>
 									    		)

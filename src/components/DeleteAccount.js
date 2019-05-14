@@ -35,7 +35,6 @@ class DeleteAccount extends Component {
         if(this.state.type === 2){
             axios.post(`https://sitegauge.io/api/twitter/${userId}/${id}/delete`)
             .then(res => {
-                console.log(res);
             })
             .catch(err => {
                 console.log(err);
@@ -45,7 +44,6 @@ class DeleteAccount extends Component {
         else if(this.state.type === 1){
             axios.post(`https://sitegauge.io/api/fb/${userId}/${id}/delete`)
             .then(res => {
-                console.log(res);
             })
             .catch(err => {
                 console.log(err);
@@ -55,7 +53,6 @@ class DeleteAccount extends Component {
         else if(this.state.type === 0){
             axios.post(`https://sitegauge.io/api/google/${userId}/${id}/delete`)
             .then(res => {
-                console.log(res);
             })
             .catch(err => {
                 console.log(err);

@@ -10,10 +10,12 @@ import Insights from './components/Insights';
 import DeleteAccount from './components/DeleteAccount';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
+import adminRoute from './components/AdminRoute';
 import Home from './components/Home';
 import DeleteUser from './components/DeleteUser';
 import BlockUser from './components/BlockUser';
 import UnblockUser from './components/UnblockUser';
+import PageNotFound from './components/PageNotFound';
 
 class App extends Component {   
   render() {
@@ -29,10 +31,11 @@ class App extends Component {
           <ProtectedRoute exact path="/addWebsite" component={AddWebsite} />
           <ProtectedRoute exact path="/addSM" component={AddSM}/>
           <ProtectedRoute exact path="/profile" component={Profile} />
-          <ProtectedRoute exact path="/admin" component={Home} />
-          <ProtectedRoute exact path="/admin/delete" component={DeleteUser} />
-          <ProtectedRoute exact path="/admin/block" component={BlockUser} />
-          <ProtectedRoute exact path="/admin/unblock" component={UnblockUser} />
+          <Route exact path="/admin" component={adminRoute(Home)} />
+          <Route exact path="/admin/delete" component={adminRoute(DeleteUser)} />
+          <Route exact path="/admin/block" component={adminRoute(BlockUser)} />
+          <Route exact path="/admin/unblock" component={adminRoute(UnblockUser)} />
+          <Route component={PageNotFound} />
         </Switch>
       </BrowserRouter>
     );

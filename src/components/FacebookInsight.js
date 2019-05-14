@@ -23,57 +23,48 @@ class FacebookInsight extends Component {
         	topLikeSources: [],
         	bestDatesToPost: [],
         	activeIndexs: [],
+        	loaded: false,
         }
     }
 
     componentDidMount = async () => {
-    	await this.fetchLikePeakDates();
-    	await this.fetchTopPost();
-    	await this.fetchTopLikeSources();
-    	await this.fetchBestTimeToPost();
+    	await this.updateMetricsFans();
+    	const res1 = await this.fetchLikePeakDates();
+    	const res2 = await this.fetchTopPost();
+    	const res3 = await this.fetchTopLikeSources();
+    	const res4 = await this.fetchBestTimeToPost();
+
+    	this.setState({
+    		bestDatesToPost: res4.data,
+    		topPosts: res2.data,
+    		peakDates: res1.data,
+    		topLikeSources: res3.data,
+    		loaded: true,
+    	})
+    }
+
+    updateMetricsFans = () => {
+    	return axios.get(`https://sitegauge.io/api/fb/${this.props.id}/dashboard-metrics-fans?pageToken=${this.props.token}`)
     }
 
     fetchBestTimeToPost = () => {
-    	axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/best-time-to-post`)
- 			.then((res) => {	
- 				this.setState({ bestDatesToPost: res.data});
- 			})
- 			.catch((err) => {
- 				console.log(err);
- 			})	
+    	return axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/best-time-to-post`)
+
     }
 
     fetchTopPost = () => {
-    	console.log(this.props.id);
-    	axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/most-engaged-post`)
- 			.then((res) => {
- 				console.log(res.data);	
- 				this.setState({ topPosts: res.data});
- 			})
- 			.catch((err) => {
- 				console.log(err);
- 			})	
+    	return axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/most-engaged-post`)
+
     }
 
  	fetchLikePeakDates = () => {
- 		axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/like-peak-dates`)
- 			.then((res) => {
- 				this.setState({ peakDates: res.data});
- 			})
- 			.catch((err) => {
- 				console.log(err);
- 			})	
+ 		return axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/like-peak-dates`)
+
  	}
 
  	fetchTopLikeSources = () => {
- 		axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/top-like-source`)
- 			.then((res) => {
- 				console.log(res.data);
- 				this.setState({ topLikeSources: res.data});
- 			})
- 			.catch((err) => {
- 				console.log(err);
- 			})	
+ 		return axios.get(`https://sitegauge.io/api/insights/fb/${this.props.id}/top-like-source`)
+	
  	}
 
   	handleClick = (e, titleProps) => {
@@ -93,6 +84,15 @@ class FacebookInsight extends Component {
 
 
     render(){
+    	if(this.state.loaded === false){
+    		return ( 
+                <div className="row">
+                    <div className="ui active centered inline text loader">
+                        Fetching analytics
+                   </div>
+               </div>
+            )
+    	}
     	const { activeIndexs } = this.state;
     	
     	return(
@@ -234,7 +234,7 @@ class FacebookInsight extends Component {
 			         			{i === 0 ? <span style={{fontSize: "18px"}}>Last week</span>: <span style={{fontSize: "18px"}}>Last month</span>}
 				         		{dates.map((date,j) => {
 				         			return(
-			        				<div className="item">
+			        				<div className="item" key={j}>
 			        					<i className="clock icon"></i>
 			        					{date.hour > 12 ? 
 			        						<span>{date.hour-12 + ":00  PM" }</span>

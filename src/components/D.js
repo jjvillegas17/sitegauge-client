@@ -58,14 +58,6 @@ class D extends Component {
         catch(err){
             console.log(err);
         }
-
-        // axios.get(`https://sitegauge.io/api/twitter/${userId}/update-account?username=${username}token=1051570758-PkX7uIurnr8Jibr3Q2ycvXyRjcVp7i72URnF0wc&tokenSecret=6riQfa9rHko8yG21PlYsiMHU0ebH4cJFir5hkWcuN1RII`)
-        //     .then((res) => {
-        //         console.log(res);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     })i  
     }
 
     formatDate = (date) => {

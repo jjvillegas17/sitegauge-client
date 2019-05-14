@@ -25,9 +25,9 @@ class FacebookPage extends Component{
             pageToken: props.token,
             pageMetrics: [],
             isOpen: false,
-            startDate: today.clone().subtract(8, "days"),
+            startDate: today.clone().subtract(7, "days"),
             endDate: today.clone().subtract(1, "days"),
-            minDate: today.clone().subtract(8, "days"),
+            minDate: today.clone().subtract(7, "days"),
             maxDate: today.clone().subtract(1, "days"),
             errorLoading: false,
             fetching: true,
@@ -62,7 +62,6 @@ class FacebookPage extends Component{
         let minDate;
         try{
             minDate = await this.getMinDate(this.state.pageId);
-            console.log(minDate.data.data);
         }
         catch(err){
             console.log(err);
@@ -80,8 +79,12 @@ class FacebookPage extends Component{
     }
 
     updateMetricsDb = () => {
-        return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics?pageToken=${this.state.pageToken}`)
+        return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics?pageToken=${this.state.pageToken}`);
     } 
+
+    updateFansMetricsDb = () => {
+       return axios.get(`https://sitegauge.io/api/fb/${this.state.pageId}/dashboard-metrics-fans?pageToken=${this.state.pageToken}`)
+    }
 
     fetchMetrics = (startD, endD) => {
         const start = typeof startD !== 'undefined' ? 

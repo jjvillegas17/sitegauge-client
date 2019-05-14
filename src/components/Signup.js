@@ -99,7 +99,6 @@ class Signup extends Component {
             }/>;
         }
 
-        console.log(this.state);
         return (
           <div className="ui grid container" style={{marginTop:"20px"}}>
             <div className="ui text container">
@@ -117,7 +116,6 @@ class Signup extends Component {
                                 <ul className="list">
                                     {
                                         this.state.error.map(err => {
-                                            console.log(err)
                                             return <li>{err[1][0]}</li>
                                         })
                                     }

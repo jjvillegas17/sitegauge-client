@@ -16,6 +16,24 @@ class Login extends Component {
         }
     }
 
+    async componentDidMount(){
+        if(localStorage.getItem("userId")!== null){
+            const userId = localStorage.getItem("userId");
+            axios.get(`https://sitegauge.io/api/${userId}/info`)
+            .then(res => {
+                this.setState({ isAdmin: res.data.is_admin,
+                    toRedirect: true
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    error: error.response.data.message,
+                    toRedirect: false
+                });
+            })
+        }
+    }
+
     handleEmailChange = event => {
         this.setState({ email: event.target.value }, () => {
           this.validateEmail();
@@ -51,7 +69,6 @@ class Login extends Component {
             password: password
           })
           .then((response) => {
-            console.log(response.data.data);
             if(response.data.data.is_blocked === 0){
                 localStorage.setItem('accessToken', response.data.data.token);
                 localStorage.setItem('userId', response.data.data.user_id);
@@ -79,7 +96,6 @@ class Login extends Component {
         await axios.get(`https://sitegauge.io/api/${userId}/info`)
             .then(res => {
                 isAdmin = res.data.is_admin;
-                console.log(isAdmin);
                 localStorage.setItem('x', isAdmin); 
                 toRedirect = true;
             })
@@ -109,6 +125,7 @@ class Login extends Component {
         }
 
         return (
+          <div style={{display: 'flex', justifyContent: 'center'}}>
           <div className="ui grid container" style={{marginTop:"20px"}}>
             <div className="ui text container">
                     <div className="ui center aligned segment" style={{borderRadius:'20px', backgroundColor:"#3cbcc3"}}>
@@ -171,6 +188,7 @@ class Login extends Component {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         );
     }

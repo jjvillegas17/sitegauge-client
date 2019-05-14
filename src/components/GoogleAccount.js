@@ -38,10 +38,10 @@ class GoogleAccount extends Component{
       pageviewsTotal: 0,
       acquisitionMetrics: [],
       isOpen: false,
-      startDate: today.clone().subtract(10, "days"),
-      endDate: today.clone().subtract(3, "days"),
+      startDate: today.clone().subtract(7, "days"),
+      endDate: today.clone().subtract(1, "days"),
       minDate: moment(props.data.date_created),
-      maxDate: today,
+      maxDate: today.clone().subtract(1, "days"),
       errorLoading: false,
 		}
 	}
@@ -77,21 +77,21 @@ class GoogleAccount extends Component{
 
 	  async componentDidMount(){
         try{
-          this.updateAudienceMetricsDb();
+          await this.updateAudienceMetricsDb();
         }
         catch(error){
           console.log(error);
         }
 
         try{
-          this.updateAcquisitionMetricsDb();
+          await this.updateAcquisitionMetricsDb();
         }
         catch(error){
           console.log(error);
         }
 
         try{
-          this.updateBehaviorMetricsDb();
+          await this.updateBehaviorMetricsDb();
         }
         catch(error){
           console.log(error);

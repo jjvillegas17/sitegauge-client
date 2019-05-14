@@ -36,7 +36,6 @@ class DeleteUser extends Component {
                 users: this.state.usersToDelete
             })
             .then(res => {
-                console.log(res);
             })
             .catch(err => {
                 console.log(err);

@@ -12,10 +12,11 @@ class TwitterAccount extends Component{
         this.state = {
             username:props.username,
             id: props.id,
-            followers: props.followers,
+            followers: 'props.followers',
             following: props.following,
             tweets: props.tweets,
             tweetMetrics: [],
+            loaded: false,
         }
     }
 
@@ -34,21 +35,36 @@ class TwitterAccount extends Component{
     }
 
     async componentDidMount(){
-        await this.fetchMetrics();
+        const res = await this.updateAccount();
+        const res1 = await this.fetchMetrics();
+        
+        this.setState({
+            tweetMetrics: res1.data,               
+            tweets: res.data.tweets,
+            followers: res.data.followers,
+            following: res.data.following,
+            loaded: true,
+        });
     }
 
     fetchMetrics = () => {
-        axios.get(`https://sitegauge.io/api/twitter/${userId}/${this.state.id}/tweet-metrics`)
-            .then((res) => {
-                // console.log(res.data);
-                this.setState({tweetMetrics: res.data});
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        return axios.get(`https://sitegauge.io/api/twitter/${userId}/${this.state.id}/tweet-metrics`);
+    }
+
+    updateAccount = () =>{
+        return axios.get(`https://sitegauge.io/api/twitter/${this.props.username}/update-account`);
     }
 
     render(){
+        if(this.state.loaded === false){
+            return ( 
+                <div className="row">
+                    <div className="ui active centered inline text loader">
+                        Fetching analytics
+                   </div>
+               </div>
+            )
+        }
     	return (
     		<Fragment>
     			<div className="four column row">

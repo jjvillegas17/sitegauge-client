@@ -36,7 +36,6 @@ class UnblockUser extends Component {
                 users: this.state.usersToDelete
             })
             .then(res => {
-                console.log(res);
             })
             .catch(err => {
                 console.log(err);
@@ -55,7 +54,6 @@ class UnblockUser extends Component {
     handleClose = () => {this.setState({ modalOpen: false })};
 
     render(){
-        console.log(this.state);
         return(
             <div>
                 <MenuAdmin />

@@ -46,7 +46,6 @@ class AddSM extends Component {
     }
 
     responseFacebook = (response) => {
-        console.log(response.accessToken);
         axios.get(`https://sitegauge.io/login/facebook/callback?token=${response.accessToken}`)
             .then((response) => {
                 this.setState({
@@ -70,7 +69,6 @@ class AddSM extends Component {
         e.preventDefault();
         axios.get(`https://sitegauge.io/login/twitter?userId=${localStorage.getItem("userId")}`)
             .then((response) => {
-                console.log(response.data);
                 window.location.href = response.data;
                 // this.setState({
                 //     pages: response.data
@@ -144,7 +142,6 @@ class AddSM extends Component {
             acct,
           )
         .then((response) => {
-            console.log(response);
         })
         .catch((error) => { 
             this.setState({errorSaving: true, loading: false });
@@ -152,11 +149,9 @@ class AddSM extends Component {
         });
 
         if(this.state.type === 0){
-            console.log(acct.pageId);
             await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics?pageToken=${acct.pageToken}`)
             .then((response) => {
                 // this.setState({errorSaving: false});
-                console.log(response);
             })
             .catch((error) => {
                 this.setState({errorSaving: true, loading: false}); 
@@ -165,7 +160,6 @@ class AddSM extends Component {
             await axios.get(`https://sitegauge.io/api/fb/${acct.pageId}/dashboard-metrics-fans?pageToken=${acct.pageToken}`)
             .then((response) => {
                 this.setState({errorSaving: false});
-                console.log(response);
             })
             .catch((error) => {
                 this.setState({errorSaving: true, loading: false}); 

@@ -51,7 +51,6 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
-                console.log(response);
                 this.setState({errorSaving: false});
             })
             .catch((error) => { 
@@ -60,7 +59,6 @@ class UploadAnalytics extends Component {
             });
         }
         else if(this.state.type === 1){
-            console.log(id);
             await axios.post(`https://sitegauge.io/api/fb/${userId}/${id}/upload`,
                 formData,
                 {
@@ -70,7 +68,6 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
-                console.log(response);
                 this.setState({errorSaving: false});
             })
             .catch((error) => { 
@@ -89,7 +86,6 @@ class UploadAnalytics extends Component {
                 }
               )
             .then((response) => {
-                console.log(response);
                 this.setState({errorSaving: false, loading: false});
             })
             .catch((error) => { 

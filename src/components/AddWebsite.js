@@ -29,7 +29,6 @@ class AddWebsite extends Component {
         e.preventDefault();
         axios.get(`https://sitegauge.io/login/google`)
             .then((res) => {
-                console.log(res.data);
                 window.location.href = res.data;
             })
             .catch((err) => {
@@ -39,7 +38,6 @@ class AddWebsite extends Component {
 
     async componentDidMount(){
         const qs = queryString.parse(this.props.location.search);
-        console.log(qs);
         if(Object.keys(qs).length === 0){
             return
         }
@@ -77,7 +75,6 @@ class AddWebsite extends Component {
     }
 
     changeView = (e) => {
-        console.log(JSON.parse(e.target.value));
         this.setState({ profile: JSON.parse(e.target.value) });
     }
 
@@ -102,7 +99,6 @@ class AddWebsite extends Component {
             expiresIn: this.state.expiresIn
         })
             .then(res => {
-                console.log(res)
             })
             .catch(err => {
                 console.log(err)
@@ -111,7 +107,6 @@ class AddWebsite extends Component {
 
         await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-acquisition-metrics?token=${this.state.token}`)
             .then((response) => {
-                console.log(response);
             })
             .catch((error) => { 
                 console.log(error);
@@ -120,7 +115,6 @@ class AddWebsite extends Component {
 
         await axios.get(`https://sitegauge.io/api/google/${userId}/${this.state.profile.profileId}/get-audience-metrics?token=${this.state.token}`)
             .then((response) => {
-                console.log(response);
             })
             .catch((error) => { 
                 console.log(error);
@@ -129,7 +123,6 @@ class AddWebsite extends Component {
 
         await axios.get(`https://sitegauge.io/api/google/${this.state.profile.profileId}/get-behavior-metrics?token=${this.state.token}`)
             .then((response) => {
-                console.log(response);
             })
             .catch((error) => { 
                 console.log(error);
